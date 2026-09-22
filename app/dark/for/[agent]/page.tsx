@@ -1,6 +1,6 @@
-import { makeThemePage } from "@/site/page";
+import { makeAgentRoute } from "@/site/page";
 
-const route = makeThemePage("light");
+const route = makeAgentRoute("dark");
 
 export const dynamicParams = false;
 export const generateStaticParams = route.generateStaticParams;

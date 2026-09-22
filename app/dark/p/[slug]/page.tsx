@@ -1,6 +1,6 @@
-import { makeThemePage } from "@/site/page";
+import { makePropertyRoute } from "@/site/page";
 
-const route = makeThemePage("twilight");
+const route = makePropertyRoute("dark");
 
 export const dynamicParams = false;
 export const generateStaticParams = route.generateStaticParams;

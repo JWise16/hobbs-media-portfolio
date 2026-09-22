@@ -9,6 +9,7 @@
   white-space: nowrap;
   display: inline-flex;
   align-items: center;
+  gap: 0.24em;
 }
 .wordmark-hero {
   font-size: clamp(40px, 15vw, 64px);
@@ -148,6 +149,7 @@
 }
 .hero-pending {
   top: calc(env(safe-area-inset-top, 0px) + 12px);
+  opacity: calc(1 - var(--pe));
 }
 
 /* Tap-to-play affordance: visible when blocked or user-paused (5A, 6B). */

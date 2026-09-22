@@ -6,58 +6,68 @@ import { findAgent } from "@/content/agents";
 import { findProperty } from "@/content/properties";
 import { brand } from "@/content/site";
 import type { ThemeId } from "@/content/themes";
-import { matchRoute, routeTitle, staticPaths } from "@/site/routes";
+import { agentParams, propertyParams } from "@/site/routes";
 
 /**
- * Factory for /<theme>/[[...path]]/page.tsx. Each theme's page file is four
- * lines that bind the theme; everything else is shared.
+ * Factories for the per-theme route files. Each file in app/<theme>/ is a
+ * handful of lines binding the theme; everything else is shared here.
  */
-export interface PageProps {
-  params: Promise<{ path?: string[] }>;
+
+const noIndex: Metadata["robots"] = { index: false, follow: false };
+
+export function makeHomeRoute(theme: ThemeId) {
+  const metadata: Metadata = {
+    title: { absolute: brand.name },
+    description: "Real estate photo, film and aerial for Seattle and Puget Sound listings.",
+  };
+  function Page() {
+    return <HomePage theme={theme} />;
+  }
+  return { Page, metadata };
 }
 
-export function makeThemePage(theme: ThemeId) {
-  async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-    const { path } = await params;
-    const match = matchRoute(path);
-    if (!match) return {};
-    const title = routeTitle(match);
-    const isShare = match.kind !== "home";
+export interface AgentProps {
+  params: Promise<{ agent: string }>;
+}
+
+export function makeAgentRoute(theme: ThemeId) {
+  async function generateMetadata({ params }: AgentProps): Promise<Metadata> {
+    const agent = findAgent((await params).agent);
+    if (!agent) return {};
     return {
-      title: title ?? { absolute: brand.name },
-      description:
-        match.kind === "agent"
-          ? `A calling card from ${brand.name}: real estate photo, film and aerial for Seattle listings.`
-          : match.kind === "property"
-            ? `${title}, filmed by ${brand.name}.`
-            : undefined,
+      title: `For ${agent.displayName}`,
+      description: `A calling card from ${brand.name}: real estate photo, film and aerial for Seattle listings.`,
       // A "PREPARED FOR JESSICA" page must never be indexed, at any stage.
-      robots: isShare ? { index: false, follow: false } : undefined,
+      robots: noIndex,
     };
   }
+  async function Page({ params }: AgentProps) {
+    const agent = findAgent((await params).agent);
+    if (!agent) notFound();
+    return <CallingCard theme={theme} agent={agent} />;
+  }
+  return { Page, generateMetadata, generateStaticParams: agentParams };
+}
 
-  async function Page({ params }: PageProps) {
-    const { path } = await params;
-    const match = matchRoute(path);
-    if (!match) notFound();
+export interface PropertyProps {
+  params: Promise<{ slug: string }>;
+}
 
-    if (match.kind === "home") return <HomePage theme={theme} />;
-
-    if (match.kind === "agent") {
-      const agent = findAgent(match.slug);
-      if (!agent) notFound();
-      return <CallingCard theme={theme} agent={agent} />;
-    }
-
-    const property = findProperty(match.slug);
+export function makePropertyRoute(theme: ThemeId) {
+  async function generateMetadata({ params }: PropertyProps): Promise<Metadata> {
+    const property = findProperty((await params).slug);
+    if (!property) return {};
+    return {
+      title: property.title,
+      description: `${property.title}, filmed by ${brand.name}.`,
+      robots: noIndex,
+    };
+  }
+  async function Page({ params }: PropertyProps) {
+    const property = findProperty((await params).slug);
     if (!property) notFound();
     const agent = property.agent ? findAgent(property.agent) : undefined;
     return <CallingCard theme={theme} property={property} agent={agent} />;
   }
-
-  return {
-    Page,
-    generateMetadata,
-    generateStaticParams: () => staticPaths(),
-  };
+  return { Page, generateMetadata, generateStaticParams: propertyParams };
 }

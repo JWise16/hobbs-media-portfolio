@@ -1,12 +1,15 @@
 import { NotFound } from "@/components/NotFound";
-import { ThemeShell } from "@/components/ThemeShell";
-import { fontClassName } from "@/fonts/dark";
 
-/** Unknown top-level paths (no theme segment) fall back to the dark theme's 404. */
+/**
+ * Unknown top-level paths (no theme segment). This file sits in the root
+ * layout's module graph for every page, so it must not import a theme font
+ * module (a `hobbs` page would otherwise preload Satoshi). It renders the
+ * dark tokens with the fallback faces.
+ */
 export default function RootNotFound() {
   return (
-    <ThemeShell theme="dark" fontClassName={fontClassName}>
+    <div data-theme="dark" className="theme-shell">
       <NotFound theme="dark" />
-    </ThemeShell>
+    </div>
   );
 }
