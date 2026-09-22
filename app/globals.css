@@ -1,0 +1,239 @@
+@import "tailwindcss";
+@import "../styles/tokens.css";
+
+@theme inline {
+  --color-surface: var(--surface);
+  --color-text: var(--text);
+  --color-muted: var(--muted);
+  --color-hairline: var(--hairline);
+  --color-button-fill: var(--button-fill);
+  --color-button-text: var(--button-text);
+  --color-hero-text: var(--hero-text);
+  --color-media-co: var(--media-co);
+  --color-on-footage: var(--on-footage);
+  --color-on-footage-muted: var(--on-footage-muted);
+  --color-pending: var(--pending);
+  --color-pending-bg: var(--pending-bg);
+  --font-display: var(--font-display), "Instrument Serif", Georgia, serif;
+  --font-support: var(--font-support), "Satoshi", "Manrope", system-ui, sans-serif;
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in srgb, var(--muted, #888) 40%, transparent) transparent;
+  }
+
+  body {
+    margin: 0;
+    min-height: 100svh;
+  }
+
+  [data-theme] {
+    background: var(--surface);
+    color: var(--text);
+    caret-color: var(--text);
+    font-family: var(--font-support);
+    font-size: 17px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    background: color-mix(in srgb, var(--muted) 30%, transparent);
+  }
+
+  /* Focus ring per the token sheet, never removed. */
+  :focus-visible {
+    outline: 2px solid var(--text);
+    outline-offset: 2px;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    font-weight: 400;
+    margin: 0;
+  }
+
+  p {
+    margin: 0;
+  }
+
+  button {
+    font: inherit;
+    color: inherit;
+    background: none;
+    border: 0;
+    padding: 0;
+    cursor: pointer;
+  }
+
+  video,
+  img {
+    display: block;
+    max-width: 100%;
+  }
+}
+
+@layer components {
+  /* Tracked caps live in rem so they scale at 200% zoom (16A). */
+  .tracked {
+    font-family: var(--font-support);
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    font-size: 0.6875rem; /* 11px */
+    font-weight: 500;
+    line-height: 1.6;
+  }
+  .tracked-xs {
+    font-size: 0.625rem; /* 10px */
+  }
+  .tracked-plaque {
+    font-size: 0.6875rem;
+    letter-spacing: 0.28em;
+    line-height: 2.1;
+    font-weight: 500;
+  }
+  @media (min-width: 1024px) {
+    .tracked-plaque {
+      font-size: 0.75rem;
+    }
+  }
+  .kicker {
+    font-size: 0.6875rem;
+    letter-spacing: 0.3em;
+    color: var(--muted);
+  }
+
+  .display-h2 {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: 44px;
+    line-height: 1.05;
+    letter-spacing: -0.01em;
+    margin-top: var(--h2-above);
+    margin-bottom: var(--h2-below);
+  }
+  @media (min-width: 1024px) {
+    .display-h2 {
+      font-size: 64px;
+    }
+  }
+  .display-h2:first-child {
+    margin-top: 0;
+  }
+
+  .body-muted {
+    color: var(--muted);
+  }
+
+  .measure {
+    max-width: 70ch;
+  }
+
+  .content {
+    width: 100%;
+    max-width: var(--content-max);
+    margin-inline: auto;
+    padding-inline: 20px;
+  }
+  @media (min-width: 1024px) {
+    .content {
+      padding-inline: 40px;
+    }
+  }
+
+  .section {
+    padding-block: var(--section-pad);
+  }
+
+  .hairline {
+    border-top: 1px solid var(--hairline);
+  }
+
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Buttons: 56px tall, tracked, radius 2px, full width on phones. */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: var(--button-h);
+    width: 100%;
+    padding-inline: 24px;
+    border-radius: 2px;
+    font-family: var(--font-support);
+    font-size: 0.8125rem; /* 13px */
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    font-weight: 500;
+    transition: opacity 120ms linear;
+  }
+  .btn:active {
+    opacity: 0.85;
+  }
+  .btn-primary {
+    background: var(--button-fill);
+    color: var(--button-text);
+  }
+  .btn-secondary {
+    border: 1px solid var(--text);
+    color: var(--text);
+  }
+  @media (min-width: 1024px) {
+    .btn {
+      width: var(--button-w-desktop);
+      max-width: 100%;
+    }
+  }
+
+  /* Tag chip: 1px outline at 60% over footage, radius 0. */
+  .chip {
+    display: inline-block;
+    border: 1px solid var(--on-footage-muted);
+    color: var(--on-footage-muted);
+    padding: 6px 12px;
+    border-radius: 0;
+    font-family: var(--font-support);
+    font-size: 0.625rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    font-weight: 500;
+    line-height: 1;
+  }
+
+  /* Every tappable element is at least 44px on its shortest side (16A). */
+  .tap {
+    min-height: var(--touch-min);
+    min-width: var(--touch-min);
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .pending-tag {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    z-index: 3;
+    background: var(--pending-bg);
+    color: var(--pending);
+    padding: 6px 10px;
+    font-family: var(--font-support);
+    font-size: 0.625rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    font-weight: 500;
+    line-height: 1;
+  }
+}
