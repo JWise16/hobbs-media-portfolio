@@ -7,7 +7,8 @@
   line-height: 1;
   letter-spacing: -0.005em;
   white-space: nowrap;
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
 }
 .wordmark-hero {
   font-size: clamp(40px, 15vw, 64px);

@@ -1,0 +1,305 @@
+/* Section layouts: mobile first, desktop per design 4A. Colors from tokens only. */
+
+/* ── What I do ────────────────────────────────────────────────────────────── */
+.services {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+.service {
+  padding-block: 28px;
+}
+.service:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+.services[data-numerals="1"] .service:first-child {
+  border-top: 1px solid var(--hairline);
+  padding-top: 28px;
+}
+.service-numeral {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 36px;
+  line-height: 1;
+  color: var(--muted);
+  margin-bottom: 20px;
+}
+.service-title {
+  font-size: 36px;
+  line-height: 1.1;
+}
+.service-desc {
+  margin-top: 10px;
+  max-width: 34ch;
+}
+@media (min-width: 1024px) {
+  .services {
+    flex-direction: row;
+    gap: 48px;
+  }
+  .service {
+    flex: 1 1 0;
+    border-top: 1px solid var(--hairline);
+    padding-top: 28px;
+  }
+  .service:first-child {
+    border-top: 1px solid var(--hairline);
+    padding-top: 28px;
+  }
+  .service-title {
+    font-size: 32px;
+  }
+}
+
+/* ── Selected work ────────────────────────────────────────────────────────── */
+.work-subline {
+  margin-top: calc(-1 * var(--h2-below) + 8px);
+  margin-bottom: 28px;
+}
+
+/* ── About ────────────────────────────────────────────────────────────────── */
+.about-p + .about-p {
+  margin-top: 20px;
+}
+.stats {
+  margin: 40px 0 0;
+  padding-top: 32px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+}
+.stat-value {
+  font-family: var(--font-display);
+  font-size: 36px;
+  line-height: 1;
+  margin: 0;
+}
+.stat-label {
+  margin-top: 8px;
+}
+@media (max-width: 399px) {
+  .stats {
+    grid-template-columns: 1fr;
+  }
+}
+@media (min-width: 1024px) {
+  .about-grid {
+    display: grid;
+    grid-template-columns: 5fr 7fr;
+    gap: 64px;
+    align-items: start;
+  }
+}
+
+/* ── Contact ──────────────────────────────────────────────────────────────── */
+.contact {
+  /* Re-scope the base tokens so every child reads the contact surface (hobbs: #111214). */
+  --surface: var(--contact-surface);
+  --text: var(--contact-text);
+  --muted: var(--contact-muted);
+  --hairline: var(--contact-hairline);
+  --button-fill: var(--contact-button-fill);
+  --button-text: var(--contact-button-text);
+  background: var(--surface);
+  color: var(--text);
+}
+.contact-sentence {
+  margin-top: 4px;
+}
+.contact-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 40px;
+}
+.contact-lines {
+  margin-top: 36px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 22px;
+  line-height: 1.3;
+}
+.contact-phone {
+  padding-inline: 0;
+}
+.contact-email {
+  color: var(--muted);
+  font-size: 19px;
+}
+.facts {
+  margin: 44px 0 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+}
+.fact-label {
+  margin-bottom: 6px;
+}
+.fact-value {
+  margin: 0;
+  font-size: 19px;
+}
+.fact-link {
+  padding-inline: 0;
+}
+@media (min-width: 1024px) {
+  .contact-grid {
+    display: grid;
+    grid-template-columns: 1fr minmax(0, var(--contact-col-max));
+    gap: 96px;
+    align-items: start;
+  }
+  .contact-buttons {
+    margin-top: 0;
+  }
+  .contact-buttons .btn {
+    width: 100%;
+  }
+}
+
+/* ── Footer ───────────────────────────────────────────────────────────────── */
+.site-footer {
+  padding: 24px 20px 40px;
+  text-align: center;
+  background: var(--surface);
+  position: relative;
+  z-index: 1;
+}
+.site-footer.contact {
+  background: var(--contact-surface);
+  color: var(--contact-text);
+}
+.site-footer-line {
+  color: var(--contact-muted, var(--muted));
+}
+
+/* ── hobbs still hero ─────────────────────────────────────────────────────── */
+.hobbs-hero {
+  position: relative;
+  min-height: 100svh;
+  display: flex;
+  align-items: flex-end;
+  color: var(--hero-text);
+  background: var(--contact-surface);
+  overflow: hidden;
+}
+.hobbs-hero .pending-tag {
+  top: calc(var(--header-h) + 12px);
+  left: 20px;
+}
+.hobbs-hero-image {
+  object-fit: cover;
+}
+.hobbs-hero-scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgb(0 0 0 / 0.6), rgb(0 0 0 / 0.15) 60%, rgb(0 0 0 / 0.3));
+  pointer-events: none;
+}
+.hobbs-hero-text {
+  position: relative;
+  z-index: 1;
+  padding-top: calc(var(--header-h) + 48px);
+  padding-bottom: 72px;
+}
+.hobbs-hero-kicker {
+  color: var(--on-footage-muted);
+}
+.hobbs-hero-headline {
+  margin-top: 20px;
+  font-size: 48px;
+  line-height: 1.02;
+  letter-spacing: -0.01em;
+  max-width: 14ch;
+}
+.hobbs-hero-mood {
+  margin-top: 20px;
+  font-size: 19px;
+  max-width: 40ch;
+  color: var(--on-footage);
+}
+.hobbs-hero-ctas {
+  margin-top: 36px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 420px;
+}
+.hobbs-hero .btn-primary {
+  background: var(--on-footage);
+  color: var(--contact-surface);
+}
+.hobbs-hero .btn-secondary {
+  border-color: var(--on-footage);
+  color: var(--on-footage);
+}
+@media (min-width: 1024px) {
+  .hobbs-hero-headline {
+    font-size: 80px;
+    max-width: 16ch;
+  }
+  .hobbs-hero-ctas {
+    flex-direction: row;
+    max-width: none;
+  }
+  .hobbs-hero-ctas .btn {
+    width: var(--button-w-desktop);
+  }
+}
+
+/* ── Calling card beat two ────────────────────────────────────────────────── */
+.beat-two-inner {
+  width: 100%;
+  max-width: 480px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+}
+.beat-two-kicker {
+  margin-top: 40px;
+  letter-spacing: 0.3em;
+  color: var(--muted);
+}
+.beat-two-name {
+  margin-top: 12px;
+  font-size: 34px;
+  line-height: 1.15;
+}
+.beat-two-buttons {
+  width: 100%;
+  margin-top: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.beat-two-buttons .btn {
+  width: 100%;
+}
+.beat-two-details {
+  margin-top: 36px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+}
+.beat-two-details a,
+.beat-two-details span {
+  padding-inline: 8px;
+}
+.beat-two-work {
+  margin-top: auto;
+  padding-top: 64px;
+  color: var(--muted);
+}
+.beat-two-address {
+  margin-top: 8px;
+  color: var(--muted);
+}
