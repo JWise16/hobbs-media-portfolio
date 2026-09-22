@@ -1,0 +1,30 @@
+{
+  "id": "placeholder-sound",
+  "hash": "530936d4",
+  "sourceHash": "efe730cfae392268c6c704f7726bc58b0cbf48b8343faf4bcdd3feaee73bd582",
+  "encoderVersion": "2026-09-22.1",
+  "preset": "medium",
+  "entry": {
+    "id": "placeholder-sound",
+    "source": "placeholder-sound.mp4",
+    "in": 0,
+    "out": 8,
+    "speed": 1,
+    "focal": {
+      "x": 0.6,
+      "y": 0.5
+    },
+    "loop": "none",
+    "ratio": "16:9",
+    "hero": false
+  },
+  "duration": 8,
+  "files": {
+    "mp4_720": "/clips/placeholder-sound.530936d4.720.mp4",
+    "poster": "/clips/placeholder-sound.530936d4.jpg",
+    "mp4_1080": "/clips/placeholder-sound.530936d4.1080.mp4",
+    "poster_1920": "/clips/placeholder-sound.530936d4.poster.1920.jpg"
+  },
+  "preview": "placeholder-sound.530936d4.preview-916.jpg",
+  "encodedAt": "2026-09-22T23:01:19.606Z"
+}

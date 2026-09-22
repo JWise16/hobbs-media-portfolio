@@ -1,0 +1,30 @@
+{
+  "id": "placeholder-harbor",
+  "hash": "32bf96dc",
+  "sourceHash": "430e7c42369fa94413ebed2af3568e029748780c0f1a94b4e320e1311c49225b",
+  "encoderVersion": "2026-09-22.1",
+  "preset": "medium",
+  "entry": {
+    "id": "placeholder-harbor",
+    "source": "placeholder-harbor.mp4",
+    "in": 0,
+    "out": 8,
+    "speed": 1,
+    "focal": {
+      "x": 0.5,
+      "y": 0.5
+    },
+    "loop": "xfade",
+    "ratio": "16:9",
+    "hero": false
+  },
+  "duration": 7.5,
+  "files": {
+    "mp4_720": "/clips/placeholder-harbor.32bf96dc.720.mp4",
+    "poster": "/clips/placeholder-harbor.32bf96dc.jpg",
+    "mp4_1080": "/clips/placeholder-harbor.32bf96dc.1080.mp4",
+    "poster_1920": "/clips/placeholder-harbor.32bf96dc.poster.1920.jpg"
+  },
+  "preview": "placeholder-harbor.32bf96dc.preview-916.jpg",
+  "encodedAt": "2026-09-22T23:01:13.894Z"
+}

@@ -1,0 +1,30 @@
+{
+  "id": "placeholder-rise",
+  "hash": "7876e9c5",
+  "sourceHash": "d6cd0ce3a6008aa18e8252e557501ab4b5a577cc9ffc7fa2784c593b95e18fd2",
+  "encoderVersion": "2026-09-22.1",
+  "preset": "medium",
+  "entry": {
+    "id": "placeholder-rise",
+    "source": "placeholder-rise.mp4",
+    "in": 0,
+    "out": 4,
+    "speed": 1,
+    "focal": {
+      "x": 0.5,
+      "y": 0.5
+    },
+    "loop": "pingpong",
+    "ratio": "16:9",
+    "hero": false
+  },
+  "duration": 7.9,
+  "files": {
+    "mp4_720": "/clips/placeholder-rise.7876e9c5.720.mp4",
+    "poster": "/clips/placeholder-rise.7876e9c5.jpg",
+    "mp4_1080": "/clips/placeholder-rise.7876e9c5.1080.mp4",
+    "poster_1920": "/clips/placeholder-rise.7876e9c5.poster.1920.jpg"
+  },
+  "preview": "placeholder-rise.7876e9c5.preview-916.jpg",
+  "encodedAt": "2026-09-22T23:01:16.806Z"
+}

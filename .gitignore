@@ -1,0 +1,24 @@
+# dependencies
+node_modules/
+# next
+.next/
+out/
+next-env.d.ts
+# vercel
+.vercel/
+# env
+.env*
+!.env.example
+# source footage is never committed (see README)
+clips/source/
+clips/preview/
+# encode temp
+public/clips/.tmp/
+# tests
+test-results/
+playwright-report/
+blob-report/
+.context/
+# os
+.DS_Store
+*.log
