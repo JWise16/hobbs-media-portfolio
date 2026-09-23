@@ -5,22 +5,22 @@ import type { ClipEntry } from "@/lib/clips.types";
 export const clips = {
   "needle-above-clouds": {
       "id": "needle-above-clouds",
-      "hash": "e1f17159",
-      "entryHash": "c112e413",
+      "hash": "fe4f916a",
+      "entryHash": "76ae0b3f",
       "ratio": "16:9",
       "focal": {
           "x": 0.5,
           "y": 0.42
       },
       "loop": "pingpong",
-      "duration": 31.732,
+      "duration": 17.117,
       "approved": false,
       "hero": true,
       "files": {
-          "mp4_720": "/clips/needle-above-clouds.e1f17159.720.mp4",
-          "poster": "/clips/needle-above-clouds.e1f17159.jpg",
-          "mp4_1080": "/clips/needle-above-clouds.e1f17159.1080.mp4",
-          "poster_1920": "/clips/needle-above-clouds.e1f17159.poster.1920.jpg"
+          "mp4_720": "/clips/needle-above-clouds.fe4f916a.720.mp4",
+          "poster": "/clips/needle-above-clouds.fe4f916a.jpg",
+          "mp4_1080": "/clips/needle-above-clouds.fe4f916a.1080.mp4",
+          "poster_1920": "/clips/needle-above-clouds.fe4f916a.poster.1920.jpg"
       }
   },
   "sailboat-sunset": {

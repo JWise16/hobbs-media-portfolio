@@ -3,9 +3,9 @@
     {
       "id": "needle-above-clouds",
       "source": "needle-above-clouds-1080.mp4",
-      "in": 14.5,
+      "in": 25.0,
       "out": 33.6,
-      "speed": 1.2,
+      "speed": 1,
       "focal": {
         "x": 0.5,
         "y": 0.42
