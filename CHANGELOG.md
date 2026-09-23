@@ -14,10 +14,15 @@ All notable changes to the Hobbs Media Co. site. Versions are `MAJOR.MINOR.PATCH
 - The 13A token sheet as CSS variables per theme, Instrument Serif as the display face everywhere with Manrope (`hobbs`) or Satoshi (cinematic) as support, and exactly two font families per page.
 - Accessibility contract: one header, main and footer per page, 44px targets, a focus ring that is never removed, labelled sections, frames with the clip title as their name, rem-scaled labels, contrast asserted over the darkest and lightest posters.
 - Vitest units (encode runs against a real ffmpeg fixture) and Playwright on iPhone 14 WebKit and desktop Chrome plus reduced-motion variants, with axe on every route and a logged-out check against a deployed preview.
+- Sam's footage: seven curated clips in his order (sailboat, the Discovery Park spit, the Acropolis, the Queen Anne rise, the yacht at dusk, the hilltop tower, the tug), cut from 4K and 1080p originals, and the Needle above the fog as the hero (26.5 s in, real speed, boomerang). Every clip loops; none holds a last frame.
+- Setup instructions for Sam (`docs/sam-setup.md`): GitHub, Vercel, a Cloudflare domain, and the facts still to confirm.
 
 ### Changed
 - Routes are explicit per theme (`app/<theme>/…`) rather than one dynamic segment, because Next.js does not allow OpenGraph images under an optional catch-all.
 - The home plaque's first line drops the spaces around its middots so it fits the 32-character limit; the tracking spaces them visually.
+- The review-only PENDING tag is gone from the hero and the stack frames; approval state shows only in the guard report.
+- Sam's phone number is confirmed and no longer a placeholder.
+- `.vercelignore` keeps the raw source footage out of the CLI upload set.
 
 ### Fixed
 - Playback races found in review: a pause interrupting a pending `play()` no longer marks a clip blocked; a poster landing after hydration cannot restart a paused hero; a retry on a blocked clip keeps the one-decoder budget; a play-once clip holds its last frame; a hidden tab pauses without waiting for an animation frame.
