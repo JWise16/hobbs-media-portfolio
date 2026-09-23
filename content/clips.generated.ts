@@ -3,10 +3,30 @@
 import type { ClipEntry } from "@/lib/clips.types";
 
 export const clips = {
+  "needle-above-clouds": {
+      "id": "needle-above-clouds",
+      "hash": "d2755835",
+      "entryHash": "4a822006",
+      "ratio": "16:9",
+      "focal": {
+          "x": 0.5,
+          "y": 0.42
+      },
+      "loop": "pingpong",
+      "duration": 30.731,
+      "approved": false,
+      "hero": true,
+      "files": {
+          "mp4_720": "/clips/needle-above-clouds.d2755835.720.mp4",
+          "poster": "/clips/needle-above-clouds.d2755835.jpg",
+          "mp4_1080": "/clips/needle-above-clouds.d2755835.1080.mp4",
+          "poster_1920": "/clips/needle-above-clouds.d2755835.poster.1920.jpg"
+      }
+  },
   "sailboat-sunset": {
       "id": "sailboat-sunset",
-      "hash": "e825e0b7",
-      "entryHash": "d21b17b8",
+      "hash": "e9491097",
+      "entryHash": "354a4249",
       "ratio": "16:9",
       "focal": {
           "x": 0.6,
@@ -15,138 +35,18 @@ export const clips = {
       "loop": "pingpong",
       "duration": 10.711,
       "approved": false,
-      "hero": true,
-      "files": {
-          "mp4_720": "/clips/sailboat-sunset.e825e0b7.720.mp4",
-          "mp4_1080": "/clips/sailboat-sunset.e825e0b7.1080.mp4",
-          "poster": "/clips/sailboat-sunset.e825e0b7.jpg",
-          "poster_1920": "/clips/sailboat-sunset.e825e0b7.poster.1920.jpg"
-      }
-  },
-  "needle-above-clouds": {
-      "id": "needle-above-clouds",
-      "hash": "c51c7369",
-      "entryHash": "0ba7c53c",
-      "ratio": "16:9",
-      "focal": {
-          "x": 0.5,
-          "y": 0.45
-      },
-      "loop": "xfade",
-      "duration": 10.511,
-      "approved": false,
-      "hero": true,
-      "files": {
-          "mp4_720": "/clips/needle-above-clouds.c51c7369.720.mp4",
-          "poster": "/clips/needle-above-clouds.c51c7369.jpg",
-          "mp4_1080": "/clips/needle-above-clouds.c51c7369.1080.mp4",
-          "poster_1920": "/clips/needle-above-clouds.c51c7369.poster.1920.jpg"
-      }
-  },
-  "yacht-dusk-wake": {
-      "id": "yacht-dusk-wake",
-      "hash": "15879954",
-      "entryHash": "197d84cf",
-      "ratio": "16:9",
-      "focal": {
-          "x": 0.5,
-          "y": 0.5
-      },
-      "loop": "xfade",
-      "duration": 8.308,
-      "approved": false,
-      "hero": true,
-      "files": {
-          "mp4_720": "/clips/yacht-dusk-wake.15879954.720.mp4",
-          "poster": "/clips/yacht-dusk-wake.15879954.jpg",
-          "mp4_1080": "/clips/yacht-dusk-wake.15879954.1080.mp4",
-          "poster_1920": "/clips/yacht-dusk-wake.15879954.poster.1920.jpg"
-      }
-  },
-  "point-sunset": {
-      "id": "point-sunset",
-      "hash": "996b8373",
-      "entryHash": "f2519675",
-      "ratio": "16:9",
-      "focal": {
-          "x": 0.5,
-          "y": 0.5
-      },
-      "loop": "xfade",
-      "duration": 8.508,
-      "approved": false,
       "hero": false,
       "files": {
-          "mp4_720": "/clips/point-sunset.996b8373.720.mp4",
-          "poster": "/clips/point-sunset.996b8373.jpg",
-          "mp4_1080": "/clips/point-sunset.996b8373.1080.mp4",
-          "poster_1920": "/clips/point-sunset.996b8373.poster.1920.jpg"
-      }
-  },
-  "marina-skyline": {
-      "id": "marina-skyline",
-      "hash": "194f80fc",
-      "entryHash": "0ff00cb2",
-      "ratio": "16:9",
-      "focal": {
-          "x": 0.6,
-          "y": 0.5
-      },
-      "loop": "xfade",
-      "duration": 10.511,
-      "approved": false,
-      "hero": false,
-      "files": {
-          "mp4_720": "/clips/marina-skyline.194f80fc.720.mp4",
-          "poster": "/clips/marina-skyline.194f80fc.jpg",
-          "mp4_1080": "/clips/marina-skyline.194f80fc.1080.mp4",
-          "poster_1920": "/clips/marina-skyline.194f80fc.poster.1920.jpg"
-      }
-  },
-  "yacht-dusk-side": {
-      "id": "yacht-dusk-side",
-      "hash": "68e63424",
-      "entryHash": "84362a74",
-      "ratio": "16:9",
-      "focal": {
-          "x": 0.5,
-          "y": 0.6
-      },
-      "loop": "xfade",
-      "duration": 7.508,
-      "approved": false,
-      "hero": false,
-      "files": {
-          "mp4_720": "/clips/yacht-dusk-side.68e63424.720.mp4",
-          "poster": "/clips/yacht-dusk-side.68e63424.jpg",
-          "mp4_1080": "/clips/yacht-dusk-side.68e63424.1080.mp4",
-          "poster_1920": "/clips/yacht-dusk-side.68e63424.poster.1920.jpg"
-      }
-  },
-  "city-rise": {
-      "id": "city-rise",
-      "hash": "e270f1fa",
-      "entryHash": "654cedde",
-      "ratio": "16:9",
-      "focal": {
-          "x": 0.5,
-          "y": 0.35
-      },
-      "loop": "pingpong",
-      "duration": 8.709,
-      "approved": false,
-      "hero": false,
-      "files": {
-          "mp4_720": "/clips/city-rise.e270f1fa.720.mp4",
-          "mp4_1080": "/clips/city-rise.e270f1fa.1080.mp4",
-          "poster": "/clips/city-rise.e270f1fa.jpg",
-          "poster_1920": "/clips/city-rise.e270f1fa.poster.1920.jpg"
+          "mp4_720": "/clips/sailboat-sunset.e9491097.720.mp4",
+          "poster": "/clips/sailboat-sunset.e9491097.jpg",
+          "mp4_1080": "/clips/sailboat-sunset.e9491097.1080.mp4",
+          "poster_1920": "/clips/sailboat-sunset.e9491097.poster.1920.jpg"
       }
   },
   "spit-golden-hour": {
       "id": "spit-golden-hour",
-      "hash": "1bf39bfd",
-      "entryHash": "26c30d3a",
+      "hash": "ce507f35",
+      "entryHash": "287d8737",
       "ratio": "16:9",
       "focal": {
           "x": 0.4,
@@ -157,30 +57,110 @@ export const clips = {
       "approved": false,
       "hero": false,
       "files": {
-          "mp4_720": "/clips/spit-golden-hour.1bf39bfd.720.mp4",
-          "poster": "/clips/spit-golden-hour.1bf39bfd.jpg",
-          "mp4_1080": "/clips/spit-golden-hour.1bf39bfd.1080.mp4",
-          "poster_1920": "/clips/spit-golden-hour.1bf39bfd.poster.1920.jpg"
+          "mp4_720": "/clips/spit-golden-hour.ce507f35.720.mp4",
+          "poster": "/clips/spit-golden-hour.ce507f35.jpg",
+          "mp4_1080": "/clips/spit-golden-hour.ce507f35.1080.mp4",
+          "poster_1920": "/clips/spit-golden-hour.ce507f35.poster.1920.jpg"
       }
   },
-  "tug-daylight": {
-      "id": "tug-daylight",
-      "hash": "c02fefd5",
-      "entryHash": "c8a55454",
+  "athens-acropolis": {
+      "id": "athens-acropolis",
+      "hash": "c557b3e3",
+      "entryHash": "8db34a72",
+      "ratio": "16:9",
+      "focal": {
+          "x": 0.5,
+          "y": 0.45
+      },
+      "loop": "pingpong",
+      "duration": 17.918,
+      "approved": false,
+      "hero": false,
+      "files": {
+          "mp4_720": "/clips/athens-acropolis.c557b3e3.720.mp4",
+          "poster": "/clips/athens-acropolis.c557b3e3.jpg",
+          "mp4_1080": "/clips/athens-acropolis.c557b3e3.1080.mp4",
+          "poster_1920": "/clips/athens-acropolis.c557b3e3.poster.1920.jpg"
+      }
+  },
+  "city-rise": {
+      "id": "city-rise",
+      "hash": "adb3e78e",
+      "entryHash": "111e2714",
       "ratio": "16:9",
       "focal": {
           "x": 0.5,
           "y": 0.4
+      },
+      "loop": "pingpong",
+      "duration": 8.709,
+      "approved": false,
+      "hero": false,
+      "files": {
+          "mp4_720": "/clips/city-rise.adb3e78e.720.mp4",
+          "poster": "/clips/city-rise.adb3e78e.jpg",
+          "mp4_1080": "/clips/city-rise.adb3e78e.1080.mp4",
+          "poster_1920": "/clips/city-rise.adb3e78e.poster.1920.jpg"
+      }
+  },
+  "yacht-dusk-wake": {
+      "id": "yacht-dusk-wake",
+      "hash": "6222c0c5",
+      "entryHash": "ca0ad851",
+      "ratio": "16:9",
+      "focal": {
+          "x": 0.5,
+          "y": 0.45
+      },
+      "loop": "xfade",
+      "duration": 9.509,
+      "approved": false,
+      "hero": false,
+      "files": {
+          "mp4_720": "/clips/yacht-dusk-wake.6222c0c5.720.mp4",
+          "poster": "/clips/yacht-dusk-wake.6222c0c5.jpg",
+          "mp4_1080": "/clips/yacht-dusk-wake.6222c0c5.1080.mp4",
+          "poster_1920": "/clips/yacht-dusk-wake.6222c0c5.poster.1920.jpg"
+      }
+  },
+  "hilltop-tower": {
+      "id": "hilltop-tower",
+      "hash": "0969bd6e",
+      "entryHash": "ea1ef232",
+      "ratio": "16:9",
+      "focal": {
+          "x": 0.5,
+          "y": 0.5
+      },
+      "loop": "xfade",
+      "duration": 9.509,
+      "approved": false,
+      "hero": false,
+      "files": {
+          "mp4_720": "/clips/hilltop-tower.0969bd6e.720.mp4",
+          "poster": "/clips/hilltop-tower.0969bd6e.jpg",
+          "mp4_1080": "/clips/hilltop-tower.0969bd6e.1080.mp4",
+          "poster_1920": "/clips/hilltop-tower.0969bd6e.poster.1920.jpg"
+      }
+  },
+  "tug-daylight": {
+      "id": "tug-daylight",
+      "hash": "a691afa4",
+      "entryHash": "f9fce6f9",
+      "ratio": "16:9",
+      "focal": {
+          "x": 0.5,
+          "y": 0.5
       },
       "loop": "xfade",
       "duration": 7.508,
       "approved": false,
       "hero": false,
       "files": {
-          "mp4_720": "/clips/tug-daylight.c02fefd5.720.mp4",
-          "poster": "/clips/tug-daylight.c02fefd5.jpg",
-          "mp4_1080": "/clips/tug-daylight.c02fefd5.1080.mp4",
-          "poster_1920": "/clips/tug-daylight.c02fefd5.poster.1920.jpg"
+          "mp4_720": "/clips/tug-daylight.a691afa4.720.mp4",
+          "poster": "/clips/tug-daylight.a691afa4.jpg",
+          "mp4_1080": "/clips/tug-daylight.a691afa4.1080.mp4",
+          "poster_1920": "/clips/tug-daylight.a691afa4.poster.1920.jpg"
       }
   },
 } as const satisfies Record<string, ClipEntry>;

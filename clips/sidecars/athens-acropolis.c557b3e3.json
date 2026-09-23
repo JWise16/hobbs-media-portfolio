@@ -1,0 +1,30 @@
+{
+  "id": "athens-acropolis",
+  "hash": "c557b3e3",
+  "sourceHash": "4e99509eba4e7b3c7598ad8e25b401e64bce2cd323730f1a0600acd3df57a766",
+  "encoderVersion": "2026-09-22.1",
+  "preset": "medium",
+  "entry": {
+    "id": "athens-acropolis",
+    "source": "athens-acropolis.mov",
+    "in": 9,
+    "out": 18,
+    "speed": 1,
+    "focal": {
+      "x": 0.5,
+      "y": 0.45
+    },
+    "loop": "pingpong",
+    "ratio": "16:9",
+    "hero": false
+  },
+  "duration": 17.918,
+  "files": {
+    "mp4_720": "/clips/athens-acropolis.c557b3e3.720.mp4",
+    "poster": "/clips/athens-acropolis.c557b3e3.jpg",
+    "mp4_1080": "/clips/athens-acropolis.c557b3e3.1080.mp4",
+    "poster_1920": "/clips/athens-acropolis.c557b3e3.poster.1920.jpg"
+  },
+  "preview": "athens-acropolis.c557b3e3.preview-916.jpg",
+  "encodedAt": "2026-09-23T16:20:55.725Z"
+}

@@ -6,7 +6,9 @@ import type { ServiceKey } from "./vocabulary";
  * Selected work, in Sam's layout: serif title, tracked subtitle, outlined tag.
  * Clip entries reference the manifest by id; photography entries use `image`
  * (public/work/*) and render as a static frame. No photos exist yet.
- * Titles are placeholders until Sam names the shoots.
+ * Order is Sam's (2026-09-23, his numbered export: 1, 2, 2, 3, 4, 5, 8; the
+ * files numbered 6 and 7 never arrived). Titles are placeholders until Sam
+ * names the shoots.
  */
 export type WorkMedia = { clip: ClipId } | { image: string; alt: string };
 
@@ -27,32 +29,18 @@ export const work: WorkItem[] = [
     media: { clip: "sailboat-sunset" },
   },
   {
-    slug: "needle-above-clouds",
-    title: todo("work.needle-above-clouds.title", "Above the Fog"),
-    subtitle: todo("work.needle-above-clouds.subtitle", "Aerial film · Seattle"),
+    slug: "spit-golden-hour",
+    title: todo("work.spit-golden-hour.title", "Golden Hour on the Spit"),
+    subtitle: todo("work.spit-golden-hour.subtitle", "Aerial film · Discovery Park"),
     tag: "drone",
-    media: { clip: "needle-above-clouds" },
+    media: { clip: "spit-golden-hour" },
   },
   {
-    slug: "marina-skyline",
-    title: todo("work.marina-skyline.title", "Marina at Dusk"),
-    subtitle: todo("work.marina-skyline.subtitle", "Aerial film · Shilshole"),
+    slug: "athens-acropolis",
+    title: todo("work.athens-acropolis.title", "The Acropolis"),
+    subtitle: todo("work.athens-acropolis.subtitle", "Aerial film · Athens"),
     tag: "drone",
-    media: { clip: "marina-skyline" },
-  },
-  {
-    slug: "yacht-dusk-side",
-    title: todo("work.yacht-dusk-side.title", "Evening Run"),
-    subtitle: todo("work.yacht-dusk-side.subtitle", "Aerial film · Puget Sound"),
-    tag: "drone",
-    media: { clip: "yacht-dusk-side" },
-  },
-  {
-    slug: "point-sunset",
-    title: todo("work.point-sunset.title", "The Point at Sunset"),
-    subtitle: todo("work.point-sunset.subtitle", "Aerial film · Discovery Park"),
-    tag: "drone",
-    media: { clip: "point-sunset" },
+    media: { clip: "athens-acropolis" },
   },
   {
     slug: "city-rise",
@@ -62,11 +50,18 @@ export const work: WorkItem[] = [
     media: { clip: "city-rise" },
   },
   {
-    slug: "spit-golden-hour",
-    title: todo("work.spit-golden-hour.title", "Golden Hour on the Spit"),
-    subtitle: todo("work.spit-golden-hour.subtitle", "Aerial film · Puget Sound"),
+    slug: "yacht-dusk-wake",
+    title: todo("work.yacht-dusk-wake.title", "Evening Run"),
+    subtitle: todo("work.yacht-dusk-wake.subtitle", "Aerial film · Puget Sound"),
     tag: "drone",
-    media: { clip: "spit-golden-hour" },
+    media: { clip: "yacht-dusk-wake" },
+  },
+  {
+    slug: "hilltop-tower",
+    title: todo("work.hilltop-tower.title", "Hilltop, Midday"),
+    subtitle: todo("work.hilltop-tower.subtitle", "Aerial film · Seattle"),
+    tag: "drone",
+    media: { clip: "hilltop-tower" },
   },
   {
     slug: "tug-daylight",

@@ -18,7 +18,7 @@ export const brand = {
 } as const;
 
 /** The home hero and every share link play this unless a property overrides it. */
-export const heroClip: ClipId = "yacht-dusk-wake";
+export const heroClip: ClipId = "needle-above-clouds";
 
 /** Optional Sam-supplied photo for the `hobbs` still hero; falls back to the hero clip's 1920 poster. */
 export const heroImage: string | null = null;

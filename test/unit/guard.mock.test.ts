@@ -65,7 +65,7 @@ describe("guard report branches", () => {
     expect(r.integrity).toEqual(['properties[orphan].agent "nobody" does not match any agent slug']);
     expect(r.limitViolations.map((v) => v.what)).toEqual(["agents[long].displayName", "agents[long].brokerage", "properties[orphan].title"]);
     expect(r.plaqueLimitViolations.map((v) => v.what)).toEqual(["/for/long plaque line 1", "/for/long plaque line 2", "/p/orphan plaque line 1"]);
-    expect(r.unapprovedClips).toEqual(["yacht-dusk-wake", "tug-daylight"]);
+    expect(r.unapprovedClips).toEqual(["needle-above-clouds", "tug-daylight"]);
     const text = r.lines.join("\n");
     expect(text).toContain("Over-limit strings (design 17A):");
     expect(text).toContain('agents[long].displayName: "Alexandria Montgomery-Whitfield" is 31 characters (limit 24)');
@@ -90,7 +90,7 @@ describe("guard report branches", () => {
       "@/content/work": () => ({
         work: [
           { slug: "a", title: "A", subtitle: "Film", tag: "drone", media: { clip: "sailboat-sunset" } },
-          { slug: "a", title: "B", subtitle: "Film", tag: "drone", media: { clip: "marina-skyline" } },
+          { slug: "a", title: "B", subtitle: "Film", tag: "drone", media: { clip: "spit-golden-hour" } },
         ],
       }),
     });
@@ -131,7 +131,7 @@ describe("guard report branches", () => {
 
   it("a generated index that disagrees with the manifest fails at every stage: ids, approval, and edited fields", async () => {
     const manifest = await realManifest();
-    const edited = manifest.default.clips.map((c) => (c.id === "marina-skyline" ? { ...c, out: 30 } : c));
+    const edited = manifest.default.clips.map((c) => (c.id === "spit-golden-hour" ? { ...c, out: 12 } : c));
     const runGuard = await guardWith({
       "@/clips/manifest.json": () => ({
         default: {
@@ -147,7 +147,7 @@ describe("guard report branches", () => {
     expect(r.integrity).toEqual([
       'clips.generated.ts has "tug-daylight" but clips/manifest.json does not: run npm run encode',
       '"sailboat-sunset" approved=true in the manifest but false in the index: run npm run encode',
-      '"marina-skyline" was edited in the manifest after the last encode (in/out/speed/focal/loop/ratio/source): run npm run encode',
+      '"spit-golden-hour" was edited in the manifest after the last encode (in/out/speed/focal/loop/ratio/source): run npm run encode',
       'clips/manifest.json has "brand-new" but clips.generated.ts does not: run npm run encode',
     ]);
     expect(r.lines.join("\n")).toContain("FAIL: fix the content integrity problems above.");
@@ -155,12 +155,14 @@ describe("guard report branches", () => {
 
   it("a manifest that fails the strict schema (a quoted approval) is an integrity error, never a pass", async () => {
     const manifest = await realManifest();
+    const at = manifest.default.clips.findIndex((c) => c.id === "sailboat-sunset");
+    expect(at).toBeGreaterThanOrEqual(0);
     const runGuard = await guardWith({
       "@/clips/manifest.json": () => ({ default: { clips: manifest.default.clips.map((c) => (c.id === "sailboat-sunset" ? { ...c, approved: "false" } : c)) } }),
     });
     const r = await runGuard({ SITE_STAGE: "review" });
     expect(r.ok).toBe(false);
-    expect(r.integrity.some((m) => m.startsWith("clips/manifest.json clips.0.approved"))).toBe(true);
+    expect(r.integrity.some((m) => m.startsWith(`clips/manifest.json clips.${at}.approved`))).toBe(true);
   });
 
   it("the guard and the encoder hash the manifest entry the same way", async () => {

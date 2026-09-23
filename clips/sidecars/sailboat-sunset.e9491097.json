@@ -1,0 +1,30 @@
+{
+  "id": "sailboat-sunset",
+  "hash": "e9491097",
+  "sourceHash": "2ae1026d36bd5bf590b129ca53351d0a46e6bf0bb5e9638fd334ef1d9ba6cc96",
+  "encoderVersion": "2026-09-22.1",
+  "preset": "medium",
+  "entry": {
+    "id": "sailboat-sunset",
+    "source": "sailboat-sunset.mov",
+    "in": 4.8,
+    "out": 10.2,
+    "speed": 1,
+    "focal": {
+      "x": 0.6,
+      "y": 0.45
+    },
+    "loop": "pingpong",
+    "ratio": "16:9",
+    "hero": false
+  },
+  "duration": 10.711,
+  "files": {
+    "mp4_720": "/clips/sailboat-sunset.e9491097.720.mp4",
+    "poster": "/clips/sailboat-sunset.e9491097.jpg",
+    "mp4_1080": "/clips/sailboat-sunset.e9491097.1080.mp4",
+    "poster_1920": "/clips/sailboat-sunset.e9491097.poster.1920.jpg"
+  },
+  "preview": "sailboat-sunset.e9491097.preview-916.jpg",
+  "encodedAt": "2026-09-23T16:20:42.623Z"
+}

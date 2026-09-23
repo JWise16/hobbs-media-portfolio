@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { work } from "../../content/work";
 import { allThemes } from "./helpers";
 
 test.describe("routes, metadata, caching", () => {
@@ -92,7 +93,7 @@ test.describe("routes, metadata, caching", () => {
   test("selected work renders every entry with title, tracked subtitle, short-form tag, and no approval chrome", async ({ page }) => {
     await page.goto("/dark");
     const frames = page.locator(".frame");
-    expect(await frames.count()).toBe(8);
+    expect(await frames.count()).toBe(work.length);
     await expect(frames.first().locator(".chip")).toHaveText("AERIAL");
     expect(await page.locator(".pending-tag").count()).toBe(0);
     await expect(frames.first().locator(".frame-title")).not.toBeEmpty();
