@@ -84,8 +84,8 @@ test.describe("hero island and playback start", () => {
   test("hero video error after the poster: poster stays, page unaffected", async ({ page }) => {
     await page.route("**/clips/*.mp4", (route) => route.abort());
     await page.goto("/dark");
-    // The island tries the 720 rung after the 1080 rung fails (desktop), then reports the error.
-    await expect(page.locator(".hero-video")).toHaveAttribute("data-hero-state", /^(error|blocked)$/, { timeout: 15_000 });
+    // The island (or the controller, after hydration) tries the 720 rung after the 1080 rung fails, then reports the error.
+    await expect(page.locator(".hero-video")).toHaveAttribute("data-hero-state", "error", { timeout: 15_000 });
     await expect(page.locator(".hero-video")).not.toHaveAttribute("data-state", "playing");
     await expect(page.locator(".hero-video")).toHaveAttribute("poster", /\.jpg$/);
     await expect(page.locator(".wordmark-hero")).toBeVisible();

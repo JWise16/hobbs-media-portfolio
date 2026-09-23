@@ -45,7 +45,10 @@ interface Entry extends Registration {
   errored: boolean;
   /** The 1080 rung failed and the 720 rung was substituted once. */
   fellBack: boolean;
+  /** Set around our own pause() calls so the pause listener can tell them from browser-initiated pauses. */
+  pausing: boolean;
   onError: () => void;
+  onPause: () => void;
 }
 
 export interface VideoBudgetOptions {
@@ -108,10 +111,12 @@ export class VideoBudget {
       playToken: 0,
       errored: false,
       fellBack: false,
+      pausing: false,
       onError: () => {
         // A broken 1080 file falls back to the 720 rung once (the island does the same pre-hydration).
         if (el.getAttribute("data-rung") === "1080" && !entry.fellBack) {
           entry.fellBack = true;
+          entry.playToken++;
           el.setAttribute("src", reg.src720);
           el.setAttribute("data-rung", "720");
           el.load();
@@ -122,10 +127,21 @@ export class VideoBudget {
         // Clip 404 or decode error after the poster: stay on the poster, log, nothing else changes.
         if (typeof console !== "undefined") console.warn("[VideoBudget] video error", reg.src720);
         entry.errored = true;
+        entry.playToken++;
+        if (reg.kind === "hero") el.setAttribute("data-hero-state", "error");
         this.setState(entry, "attached");
+      },
+      onPause: () => {
+        // The browser paused it (Low Power Mode engaging, an interruption, Safari
+        // suspending offscreen media). Give the slot back so the policy can replay or reassign.
+        if (entry.pausing || entry.state !== "playing") return;
+        entry.playToken++;
+        this.setState(entry, "attached");
+        this.schedule();
       },
     };
     el.addEventListener("error", entry.onError);
+    el.addEventListener("pause", entry.onPause);
     // React does not serialize `muted`; the property is what play() checks.
     el.muted = true;
     el.defaultMuted = true;
@@ -145,7 +161,8 @@ export class VideoBudget {
     const entry = this.entries.get(el);
     if (!entry) return;
     el.removeEventListener("error", entry.onError);
-    if (entry.state === "playing") el.pause();
+    el.removeEventListener("pause", entry.onPause);
+    if (entry.state === "playing") this.pauseElement(entry);
     this.entries.delete(el);
   }
 
@@ -154,18 +171,20 @@ export class VideoBudget {
     const entry = this.entries.get(el);
     if (!entry) return false;
     if (entry.state === "blocked" || entry.errored) {
-      // Blocked: the tap is the user gesture iOS wanted. Try again.
+      // Blocked: the tap is the user gesture iOS wanted. Try again. An errored
+      // element needs a fresh resource selection, so its src is re-attached first.
       entry.userPaused = false;
-      entry.errored = false;
+      if (entry.errored) {
+        entry.errored = false;
+        el.removeAttribute("src");
+        this.attach(entry);
+      }
       this.play(entry);
       return false;
     }
     entry.userPaused = !entry.userPaused;
     if (entry.userPaused) {
-      if (entry.state === "playing") {
-        entry.playToken++;
-        el.pause();
-      }
+      if (entry.state === "playing") this.pauseElement(entry);
       this.setState(entry, "paused");
     } else {
       this.setState(entry, entry.el.getAttribute("src") ? "attached" : "detached");
@@ -247,9 +266,20 @@ export class VideoBudget {
     this.setState(e, e.userPaused ? "paused" : "attached");
   }
 
-  private detach(e: Entry): void {
+  /** Our own pauses bump the token and are invisible to the pause listener. */
+  private pauseElement(e: Entry): void {
     e.playToken++;
-    if (e.state === "playing") e.el.pause();
+    e.pausing = true;
+    try {
+      e.el.pause();
+    } finally {
+      e.pausing = false;
+    }
+  }
+
+  private detach(e: Entry): void {
+    if (e.state === "playing") this.pauseElement(e);
+    else e.playToken++;
     e.errored = false;
     e.fellBack = false;
     e.el.removeAttribute("src");
@@ -291,8 +321,7 @@ export class VideoBudget {
   }
 
   private pause(e: Entry): void {
-    e.playToken++;
-    e.el.pause();
+    this.pauseElement(e);
     this.setState(e, e.userPaused ? "paused" : "attached");
   }
 }

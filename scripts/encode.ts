@@ -718,8 +718,9 @@ export async function encode(opts: EncodeOptions = {}): Promise<EncodeSummary> {
   await fs.mkdir(o.sidecarDir, { recursive: true });
 
   // One encode at a time per output directory: a second run would otherwise
-  // delete the first run's in-flight temp files.
-  const lockPath = path.join(o.outDir, ".encode.lock");
+  // delete the first run's in-flight temp files. The lock lives beside the
+  // sidecars, never under public/.
+  const lockPath = path.join(o.sidecarDir, ".encode.lock");
   try {
     await fs.writeFile(lockPath, `${process.pid}\n`, { flag: "wx" });
   } catch {
@@ -770,19 +771,19 @@ export async function encode(opts: EncodeOptions = {}): Promise<EncodeSummary> {
         files: sidecar.files,
       });
     }
+
+    summary.pruned.push(...(await pruneDir(o.outDir, keep)));
+    summary.pruned.push(...(await pruneDir(o.sidecarDir, keep)));
+    summary.pruned.push(...(await pruneDir(o.previewDir, keep)));
+    for (const name of summary.pruned) log(`- pruned ${name}`);
+
+    await fs.mkdir(path.dirname(o.indexPath), { recursive: true });
+    await writeFileAtomic(o.indexPath, renderIndex(entries));
+    for (const e of entries) summary.index[e.id] = e;
   } finally {
     await fs.rm(tmpDir, { recursive: true, force: true });
     await fs.rm(lockPath, { force: true });
   }
-
-  summary.pruned.push(...(await pruneDir(o.outDir, keep)));
-  summary.pruned.push(...(await pruneDir(o.sidecarDir, keep)));
-  summary.pruned.push(...(await pruneDir(o.previewDir, keep)));
-  for (const name of summary.pruned) log(`- pruned ${name}`);
-
-  await fs.mkdir(path.dirname(o.indexPath), { recursive: true });
-  await writeFileAtomic(o.indexPath, renderIndex(entries));
-  for (const e of entries) summary.index[e.id] = e;
 
   log(
     `done: ${summary.encoded.length} encoded, ${summary.skipped.length} unchanged, ${summary.pruned.length} pruned → ${path.relative(process.cwd(), o.indexPath)}`,

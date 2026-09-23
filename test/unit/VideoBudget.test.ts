@@ -162,6 +162,44 @@ describe("VideoBudget", () => {
     warn.mockRestore();
   });
 
+  it("a browser-initiated pause gives the slot back; our own pauses do not", async () => {
+    const b = budget();
+    const a = fakeVideo(100);
+    reg(b, a);
+    b.update();
+    b.update();
+    await flush();
+    expect(a.el.getAttribute("data-state")).toBe("playing");
+    a.el.dispatchEvent(new Event("pause")); // Low Power Mode engaging
+    expect(a.el.getAttribute("data-state")).toBe("attached");
+    b.update();
+    await flush();
+    expect(a.el.getAttribute("data-state")).toBe("playing");
+    expect(a.play).toHaveBeenCalledTimes(2);
+    // Our own pause (tap) must not bounce back to attached.
+    b.toggle(a.el);
+    a.el.dispatchEvent(new Event("pause"));
+    expect(a.el.getAttribute("data-state")).toBe("paused");
+  });
+
+  it("a tap on an errored clip re-attaches the src before retrying; a hero error is reported on the island state", async () => {
+    const b = budget();
+    const a = fakeVideo(100);
+    a.el.setAttribute("data-hero-init", "1");
+    a.el.setAttribute("data-hero-state", "playing");
+    a.el.setAttribute("src", "/h.720.mp4");
+    reg(b, a, "hero", { src720: "/h.720.mp4", src1080: undefined });
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    a.el.dispatchEvent(new Event("error"));
+    expect(a.el.getAttribute("data-hero-state")).toBe("error");
+    (a.el.load as unknown as ReturnType<typeof vi.fn>).mockClear();
+    b.toggle(a.el);
+    expect(a.el.load).toHaveBeenCalled();
+    expect(a.el.getAttribute("src")).toBe("/h.720.mp4");
+    expect(a.play).toHaveBeenCalledTimes(1);
+    warn.mockRestore();
+  });
+
   it("play() rejection → BLOCKED with the affordance state; a tap retries", async () => {
     const b = budget();
     const a = fakeVideo(100, 400, "reject");

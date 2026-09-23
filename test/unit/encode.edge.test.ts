@@ -120,6 +120,7 @@ describe("encode edges", () => {
     const e = await expectCode(encode({ ...ws.opts, force: true, exec: failing }), "ENCODE_FAILED");
     expect(e.message).toMatch(/poster failed on clip "sunset"/);
     expect(e.message).toContain("poster boom");
-    expect(fs.existsSync(path.join(ws.outDir, ".tmp"))).toBe(false);
+    expect(fs.readdirSync(ws.outDir).filter((f) => f.startsWith(".tmp"))).toEqual([]);
+    expect(fs.existsSync(path.join(ws.sidecarDir, ".encode.lock"))).toBe(false);
   });
 });

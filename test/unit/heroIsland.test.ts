@@ -194,4 +194,39 @@ describe("heroInit (the inline script, executed standalone)", () => {
     v.dispatchEvent(new Event("error"));
     expect(v.getAttribute("data-hero-state")).toBe("error");
   });
+
+  it("a stale AbortError from the load() after the fallback never marks the hero blocked", async () => {
+    stubMatchMedia({ "(min-width: 1024px)": true });
+    stubImage(true);
+    let rejectFirst: ((e: Error) => void) | null = null;
+    let calls = 0;
+    const v = makeVideo(
+      { src: "/720.mp4", "data-src-720": "/720.mp4", "data-src-1080": "/1080.mp4", poster: "/p.jpg", "data-hero-init": "0" },
+      () => (++calls === 1 ? new Promise<void>((_, rej) => (rejectFirst = rej)) : Promise.resolve()),
+    );
+    v.load = vi.fn();
+    heroInit(v);
+    await tick();
+    v.dispatchEvent(new Event("error")); // 1080 fails while the first play() is pending
+    const abort = new Error("interrupted by load()");
+    abort.name = "AbortError";
+    rejectFirst!(abort);
+    await tick();
+    expect(v.getAttribute("data-hero-state")).toBe("playing");
+  });
+
+  it("once the controller owns the element (data-state present) the island handler steps aside", async () => {
+    stubMatchMedia({ "(min-width: 1024px)": true });
+    stubImage(true);
+    const v = makeVideo(
+      { src: "/720.mp4", "data-src-720": "/720.mp4", "data-src-1080": "/1080.mp4", poster: "/p.jpg", "data-hero-init": "0" },
+      () => Promise.resolve(),
+    );
+    heroInit(v);
+    await tick();
+    v.setAttribute("data-state", "playing");
+    v.dispatchEvent(new Event("error"));
+    expect(v.getAttribute("src")).toBe("/1080.mp4"); // untouched: the controller handles it
+    expect(v.getAttribute("data-hero-state")).toBe("playing");
+  });
 });

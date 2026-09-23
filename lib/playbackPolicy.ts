@@ -26,21 +26,45 @@ export function heroInit(v: HTMLVideoElement): void {
     v.setAttribute("data-rung", "1080");
   }
   var started = false;
+  var attempt = 0;
+  // Every play() goes through here. A settlement from a superseded attempt
+  // (a load() after the 1080 fallback rejects the old promise with AbortError)
+  // must not touch the state.
+  var tryPlay = function () {
+    var id = ++attempt;
+    v.setAttribute("data-hero-state", "starting");
+    var p = null;
+    try {
+      p = v.play();
+    } catch (_e) {
+      p = null;
+    }
+    if (p && typeof p.then === "function") {
+      p.then(
+        function () {
+          if (id === attempt) v.setAttribute("data-hero-state", "playing");
+        },
+        function (err) {
+          if (id !== attempt) return;
+          if (err && err.name === "AbortError") return;
+          v.setAttribute("data-hero-state", "blocked");
+        },
+      );
+    } else {
+      v.setAttribute("data-hero-state", "playing");
+    }
+  };
   v.addEventListener("error", function () {
+    // Once the page controller has registered the element (it sets data-state) it owns errors.
+    if (v.hasAttribute("data-state")) return;
     // A broken 1080 file falls back to the 720 rung once; a second failure stays on the poster.
     var lo = v.getAttribute("data-src-720");
     if (lo && v.getAttribute("data-rung") === "1080") {
+      attempt++;
       v.setAttribute("data-rung", "720");
       v.setAttribute("src", lo);
       v.load();
-      if (started) {
-        try {
-          var q = v.play();
-          if (q && typeof q.then === "function") q.then(null, function () {});
-        } catch (_e) {
-          /* poster stays */
-        }
-      }
+      if (started) tryPlay();
       return;
     }
     v.setAttribute("data-hero-state", "error");
@@ -53,25 +77,7 @@ export function heroInit(v: HTMLVideoElement): void {
     if (started) return;
     started = true;
     v.setAttribute("preload", "auto");
-    v.setAttribute("data-hero-state", "starting");
-    var p = null;
-    try {
-      p = v.play();
-    } catch (_e) {
-      p = null;
-    }
-    if (p && typeof p.then === "function") {
-      p.then(
-        function () {
-          v.setAttribute("data-hero-state", "playing");
-        },
-        function () {
-          v.setAttribute("data-hero-state", "blocked");
-        },
-      );
-    } else {
-      v.setAttribute("data-hero-state", "playing");
-    }
+    tryPlay();
   };
   var poster = v.getAttribute("poster");
   if (poster) {

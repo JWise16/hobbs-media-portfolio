@@ -46,9 +46,12 @@ describe("guard report (T6, T2, 17A)", () => {
     expect(without.launch.join(" ")).toContain("SITE_URL must be an absolute https URL");
     const bad = await runGuard({ SITE_STAGE: "live", SITE_URL: "hobbsmedia.co" });
     expect(bad.launch).toHaveLength(1);
+    expect(bad.lines.join("\n")).toContain("Launch requirements:");
+    const http = await runGuard({ SITE_STAGE: "live", SITE_URL: "http://hobbsmedia.co" });
+    expect(http.launch).toHaveLength(1);
     const good = await runGuard({ SITE_STAGE: "live", SITE_URL: "https://hobbsmedia.co/" });
     expect(good.launch).toEqual([]);
-    expect(good.lines.join("\n")).toContain("launch requirement");
+    expect(good.lines.join("\n")).not.toContain("Launch requirements:");
   });
 
   it("review: the manifest, the generated index, and the agent references agree", async () => {

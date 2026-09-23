@@ -378,7 +378,8 @@ describe("encode (real ffmpeg on the 2 s fixture)", () => {
       expect(fs.existsSync(path.join(ws.previewDir, `${base}.preview-916.jpg`))).toBe(true);
     }
     // no temp dir or lock left behind
-    expect(fs.readdirSync(ws.outDir).filter((f) => f.startsWith(".tmp") || f === ".encode.lock")).toEqual([]);
+    expect(fs.readdirSync(ws.outDir).filter((f) => f.startsWith("."))).toEqual([]);
+    expect(fs.readdirSync(ws.sidecarDir).filter((f) => f.startsWith("."))).toEqual([]);
 
     // rung sizes and poster widths
     const sunset = s.index.sunset;
@@ -514,13 +515,13 @@ describe("encode: locking, sidecar trust, CLI args", () => {
   it("refuses to run while another encode holds the lock, and clears it afterwards", async () => {
     const ws = workspace();
     ws.writeManifest(manifestOf(baseEntry({ id: "sunset" })));
-    fs.mkdirSync(ws.outDir, { recursive: true });
-    fs.writeFileSync(path.join(ws.outDir, ".encode.lock"), "999999\n");
+    fs.mkdirSync(ws.sidecarDir, { recursive: true });
+    fs.writeFileSync(path.join(ws.sidecarDir, ".encode.lock"), "999999\n");
     const e = await expectCode(encode(ws.opts), "LOCKED");
     expect(e.message).toContain(".encode.lock");
-    fs.rmSync(path.join(ws.outDir, ".encode.lock"));
+    fs.rmSync(path.join(ws.sidecarDir, ".encode.lock"));
     await encode(ws.opts);
-    expect(fs.existsSync(path.join(ws.outDir, ".encode.lock"))).toBe(false);
+    expect(fs.existsSync(path.join(ws.sidecarDir, ".encode.lock"))).toBe(false);
   });
 
   it("ignores a sidecar that names another clip's files or fails the schema", async () => {

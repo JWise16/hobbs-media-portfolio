@@ -12,8 +12,9 @@ next-env.d.ts
 # source footage is never committed (see README)
 clips/source/
 clips/preview/
-# encode temp
-public/clips/.tmp/
+# encode temp and lock
+public/clips/.tmp-*/
+clips/sidecars/.encode.lock
 # tests
 test-results/
 playwright-report/

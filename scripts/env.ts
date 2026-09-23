@@ -9,6 +9,8 @@ import { parseEnv } from "node:util";
  */
 export function loadDotEnv(cwd = process.cwd(), files = [".env.local", ".env"]): string[] {
   const applied: string[] = [];
+  // util.parseEnv arrived in Node 20.12; engines requires it, but never crash a build over dotenv.
+  if (typeof parseEnv !== "function") return applied;
   for (const name of files) {
     const file = path.join(cwd, name);
     if (!fs.existsSync(file)) continue;

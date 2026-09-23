@@ -79,7 +79,7 @@ export async function runGuard(env: GuardEnv = process.env): Promise<GuardReport
     const url = env.SITE_URL;
     let parsed = false;
     try {
-      parsed = !!url && new URL(url).protocol.startsWith("http");
+      parsed = !!url && new URL(url).protocol === "https:";
     } catch {
       parsed = false;
     }
