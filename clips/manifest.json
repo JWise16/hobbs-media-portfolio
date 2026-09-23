@@ -1,0 +1,124 @@
+{
+  "clips": [
+    {
+      "id": "needle-above-clouds",
+      "source": "needle-above-clouds-1080.mp4",
+      "in": 26.5,
+      "out": 33.6,
+      "speed": 1,
+      "focal": {
+        "x": 0.5,
+        "y": 0.42
+      },
+      "loop": "pingpong",
+      "ratio": "16:9",
+      "hero": true,
+      "approved": false
+    },
+    {
+      "id": "sailboat-sunset",
+      "source": "sailboat-sunset.mov",
+      "in": 4.8,
+      "out": 10.2,
+      "speed": 1,
+      "focal": {
+        "x": 0.6,
+        "y": 0.45
+      },
+      "loop": "pingpong",
+      "ratio": "16:9",
+      "hero": false,
+      "approved": false
+    },
+    {
+      "id": "spit-golden-hour",
+      "source": "spit-golden-hour.mov",
+      "in": 0,
+      "out": 10,
+      "speed": 1,
+      "focal": {
+        "x": 0.4,
+        "y": 0.5
+      },
+      "loop": "xfade",
+      "ratio": "16:9",
+      "hero": false,
+      "approved": false
+    },
+    {
+      "id": "athens-acropolis",
+      "source": "athens-acropolis.mov",
+      "in": 9,
+      "out": 18,
+      "speed": 1,
+      "focal": {
+        "x": 0.5,
+        "y": 0.45
+      },
+      "loop": "pingpong",
+      "ratio": "16:9",
+      "hero": false,
+      "approved": false
+    },
+    {
+      "id": "city-rise",
+      "source": "city-rise.mov",
+      "in": 0,
+      "out": 4.4,
+      "speed": 1,
+      "focal": {
+        "x": 0.5,
+        "y": 0.4
+      },
+      "loop": "pingpong",
+      "ratio": "16:9",
+      "hero": false,
+      "approved": false
+    },
+    {
+      "id": "yacht-dusk-wake",
+      "source": "yacht-dusk-wake.mov",
+      "in": 23.5,
+      "out": 33.5,
+      "speed": 1,
+      "focal": {
+        "x": 0.5,
+        "y": 0.45
+      },
+      "loop": "xfade",
+      "ratio": "16:9",
+      "hero": false,
+      "approved": false
+    },
+    {
+      "id": "hilltop-tower",
+      "source": "hilltop-tower.mov",
+      "in": 0,
+      "out": 10,
+      "speed": 1,
+      "focal": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "loop": "xfade",
+      "ratio": "16:9",
+      "hero": false,
+      "approved": false
+    },
+    {
+      "id": "tug-daylight",
+      "source": "tug-daylight.mov",
+      "in": 0.5,
+      "out": 8.5,
+      "speed": 1,
+      "focal": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "loop": "xfade",
+      "ratio": "16:9",
+      "hero": false,
+      "approved": false
+    }
+  ]
+}

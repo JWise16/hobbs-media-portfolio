@@ -1,0 +1,30 @@
+{
+  "id": "city-rise",
+  "hash": "adb3e78e",
+  "sourceHash": "617c0e3c9c56ffac2a2dc95863af10a333988621da0ea86e2dffc913ad91e29a",
+  "encoderVersion": "2026-09-22.1",
+  "preset": "medium",
+  "entry": {
+    "id": "city-rise",
+    "source": "city-rise.mov",
+    "in": 0,
+    "out": 4.4,
+    "speed": 1,
+    "focal": {
+      "x": 0.5,
+      "y": 0.4
+    },
+    "loop": "pingpong",
+    "ratio": "16:9",
+    "hero": false
+  },
+  "duration": 8.709,
+  "files": {
+    "mp4_720": "/clips/city-rise.adb3e78e.720.mp4",
+    "poster": "/clips/city-rise.adb3e78e.jpg",
+    "mp4_1080": "/clips/city-rise.adb3e78e.1080.mp4",
+    "poster_1920": "/clips/city-rise.adb3e78e.poster.1920.jpg"
+  },
+  "preview": "city-rise.adb3e78e.preview-916.jpg",
+  "encodedAt": "2026-09-23T16:20:59.681Z"
+}

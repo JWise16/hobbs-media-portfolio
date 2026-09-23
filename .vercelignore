@@ -1,0 +1,8 @@
+# Vercel CLI upload set (the CLI does not honour .gitignore for this).
+clips/source
+clips/preview
+node_modules
+.next
+test-results
+playwright-report
+.env*.local

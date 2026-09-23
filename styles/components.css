@@ -1,0 +1,359 @@
+/* Hero, stack frames, header, wordmark. Colors come from tokens only. */
+
+/* ── Wordmark ─────────────────────────────────────────────────────────────── */
+.wordmark {
+  font-family: var(--font-display);
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: -0.005em;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.24em;
+}
+.wordmark-hero {
+  font-size: clamp(40px, 15vw, 64px);
+}
+@media (min-width: 1024px) {
+  .wordmark-hero {
+    font-size: clamp(64px, 7vw, 104px);
+  }
+}
+.wordmark-card {
+  font-size: 56px;
+}
+.wordmark-header {
+  font-size: 18px;
+}
+
+/* ── Plaque ───────────────────────────────────────────────────────────────── */
+.plaque {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+.plaque-line {
+  display: block;
+}
+.plaque-tel {
+  min-height: var(--touch-min);
+  display: inline-flex;
+  align-items: center;
+  padding-inline: 8px;
+}
+
+.hero-mark {
+  font-size: inherit;
+  line-height: 1;
+}
+
+/* ── Hero ─────────────────────────────────────────────────────────────────── */
+.hero {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  height: 100svh;
+  z-index: 0;
+  overflow: hidden;
+  background: var(--surface);
+  color: var(--hero-text);
+  --p: 0;
+  --pe: 0;
+}
+.hero-frame {
+  position: absolute;
+  inset: 0;
+  outline-offset: -4px;
+}
+.hero-media {
+  position: absolute;
+  inset: 0;
+}
+.hero-island,
+.hero-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.hero-video {
+  object-fit: cover;
+  background: var(--surface);
+}
+.hero-tint,
+.hero-scrim,
+.hero-dim {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.hero-tint {
+  background: var(--overlay-tint);
+}
+.hero-scrim-radial {
+  background: var(--scrim-radial);
+}
+@media (min-width: 1024px) {
+  .hero-scrim-radial {
+    background: var(--scrim-radial-desktop);
+  }
+}
+.hero-scrim-bottom {
+  background: var(--scrim-bottom);
+}
+.hero-dim {
+  background: var(--dim-target);
+  opacity: calc(var(--dim-max) * var(--pe));
+}
+.hero-text {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 20px;
+  padding-inline: 24px;
+  pointer-events: none;
+  transform: translateY(calc(var(--mark-lift) * var(--pe)));
+  opacity: calc(1 - var(--pe));
+}
+.hero-text a {
+  pointer-events: auto;
+}
+@media (min-width: 1024px) {
+  .hero-text {
+    align-items: center;
+    left: calc(var(--focal-x, 50%) - 50%);
+    right: calc(50% - var(--focal-x, 50%));
+  }
+}
+.hero-plaque {
+  /* The plaque fades before the mark (13A motion). */
+  opacity: calc(1 - min(1, var(--p) * 2));
+}
+.hero-cue {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 24px);
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  color: var(--hero-text);
+  letter-spacing: 0.3em;
+  opacity: calc(1 - min(1, var(--p) * 5));
+  pointer-events: none;
+}
+.hero-cue .tracked {
+  letter-spacing: 0.3em;
+}
+
+/* Tap-to-play affordance: visible when blocked or user-paused (5A, 6B). */
+.affordance {
+  position: absolute;
+  left: 50%;
+  bottom: 22%;
+  transform: translateX(-50%);
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  color: var(--on-footage);
+  opacity: 0;
+  transition: opacity 160ms linear;
+  pointer-events: none;
+}
+.affordance-ring {
+  width: var(--touch-min);
+  height: var(--touch-min);
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding-left: 3px;
+}
+.hero:has(.hero-video[data-hero-state="blocked"]) .affordance,
+.hero:has(.hero-video[data-state="blocked"]) .affordance,
+.hero:has(.hero-video[data-state="paused"]) .affordance,
+.frame:has(.frame-video[data-state="blocked"]) .affordance,
+.frame:has(.frame-video[data-state="paused"]) .affordance {
+  opacity: 1;
+}
+/* Once the island reports playing, the pre-hydration blocked state cannot show. */
+.hero:has(.hero-video[data-state="playing"]) .affordance {
+  opacity: 0;
+}
+
+/* Reduced motion and no JS: normal flow, static poster, sections directly below (8A). */
+@media (prefers-reduced-motion: reduce) {
+  .hero {
+    position: relative;
+  }
+  .hero-dim,
+  .hero-cue {
+    display: none;
+  }
+  .hero-text {
+    transform: none;
+    opacity: 1;
+  }
+  .hero-plaque {
+    opacity: 1;
+  }
+}
+
+/* ── Sections over the hero ───────────────────────────────────────────────── */
+.sections {
+  position: relative;
+  z-index: 1;
+  background: var(--surface);
+}
+.beat-two {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 80px 24px 48px;
+  /* Transparent: the reel ghosts through the hero's 0.86 dim (7A). */
+  background: transparent;
+}
+
+/* ── Stack frames ─────────────────────────────────────────────────────────── */
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--stack-gap);
+}
+.frame {
+  margin: 0;
+  position: relative;
+  outline-offset: 2px;
+  cursor: pointer;
+}
+.frame-still {
+  cursor: default;
+}
+.frame-box {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  background: var(--surface);
+  overflow: hidden;
+}
+.frame-poster,
+.frame-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.frame-video {
+  opacity: 0;
+  transition: opacity 200ms linear;
+}
+.frame-video[data-state="playing"],
+.frame-video[data-state="paused"] {
+  opacity: 1;
+}
+.frame-scrim {
+  position: absolute;
+  inset: 0;
+  background: var(--scrim-stack);
+  pointer-events: none;
+}
+.frame-chip {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 2;
+}
+.frame-caption {
+  position: absolute;
+  left: 20px;
+  right: 20px;
+  bottom: 18px;
+  z-index: 2;
+  color: var(--on-footage);
+}
+.frame-title {
+  font-size: 28px;
+  line-height: 1.1;
+}
+.frame-subtitle {
+  margin-top: 6px;
+  color: var(--on-footage-muted);
+}
+@media (min-width: 1024px) {
+  .frame-box {
+    max-width: 1200px;
+    max-height: 675px;
+  }
+  .frame-caption {
+    left: 28px;
+    bottom: 24px;
+  }
+}
+
+/* ── Header ───────────────────────────────────────────────────────────────── */
+.site-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  height: var(--header-h);
+  background: color-mix(in srgb, var(--surface) 92%, transparent);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--header-fade) linear;
+}
+.site-header[data-visible="1"] {
+  opacity: 1;
+  pointer-events: auto;
+}
+.site-header-inner {
+  height: 100%;
+  width: 100%;
+  max-width: var(--content-max);
+  margin-inline: auto;
+  padding-inline: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+@media (min-width: 1024px) {
+  .site-header-inner {
+    padding-inline: 40px;
+  }
+}
+.site-header-link {
+  padding-inline: 8px;
+}
+/* hobbs: static over the still hero, no surface until past the hero (18A). */
+.site-header[data-mode="static-then-sticky"] {
+  background: transparent;
+  color: var(--hero-text);
+}
+.site-header[data-mode="static-then-sticky"] .text-text {
+  color: var(--hero-text);
+}
+.site-header[data-mode="static-then-sticky"][data-past-hero="1"] {
+  background: color-mix(in srgb, var(--surface) 92%, transparent);
+  color: var(--text);
+}
+.site-header[data-mode="static-then-sticky"][data-past-hero="1"] .text-text {
+  color: var(--text);
+}

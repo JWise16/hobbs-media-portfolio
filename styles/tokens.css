@@ -1,0 +1,195 @@
+/*
+ * Token sheet (design review 13A, promoted in DESIGN.md). Values are starting
+ * points, tuned by eye, never renamed. Components read only these variables;
+ * this file and app/globals.css are the only places a literal color may appear.
+ */
+
+:root {
+  /* Scrims that keep text legible over footage (1A). */
+  --scrim-radial: radial-gradient(ellipse 60% 50% at 50% 50%, rgb(0 0 0 / 0.35), transparent);
+  --scrim-bottom: linear-gradient(to top, rgb(0 0 0 / 0.55), rgb(0 0 0 / 0) 45%);
+  /* Desktop: the radial sits over the calm region the manifest focal marks (1A). */
+  --scrim-radial-desktop: radial-gradient(ellipse 45% 50% at var(--focal-x, 50%) 50%, rgb(0 0 0 / 0.35), transparent);
+  --scrim-stack: linear-gradient(to top, rgb(0 0 0 / 0.6), transparent 45%);
+  /* hobbs still hero: darker foot for the headline and CTAs, light lift at the top for the header. */
+  --scrim-hobbs-hero: linear-gradient(to top, rgb(0 0 0 / 0.6), rgb(0 0 0 / 0.15) 60%, rgb(0 0 0 / 0.3));
+  /* Text and chip colors that sit directly on footage or posters. */
+  --on-footage: #f3efe6;
+  --on-footage-muted: rgb(243 239 230 / 0.6);
+
+  /* Layout and motion tokens. */
+  --header-h: 56px;
+  --button-h: 56px;
+  --button-w-desktop: 320px;
+  --content-max: 1200px;
+  --contact-col-max: 480px;
+  --section-pad: 96px;
+  --stack-gap: 12px;
+  --h2-above: 64px;
+  --h2-below: 24px;
+  --touch-min: 44px;
+  /* The dim travels over 0.6svh (DIM_TRAVEL in lib/scrollDim.ts) and eases out cubic there. */
+  --dim-max: 0.86;
+  --mark-lift: -24px;
+  --header-fade: 200ms;
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --section-pad: 144px;
+    --stack-gap: 24px;
+  }
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+  --surface: #0b0d12;
+  --text: #f3efe6;
+  --muted: #8c9bb0;
+  --hairline: rgb(255 255 255 / 0.12);
+  --button-fill: #f3efe6;
+  --button-text: #0b0d12;
+  --hero-text: #f3efe6;
+  --overlay-tint: rgb(20 30 50 / 0.25);
+  --dim-target: #0b0d12;
+  --media-co: var(--muted);
+  --contact-surface: var(--surface);
+  --contact-text: var(--text);
+  --contact-muted: var(--muted);
+  --contact-hairline: var(--hairline);
+  --contact-button-fill: var(--button-fill);
+  --contact-button-text: var(--button-text);
+}
+
+[data-theme="light"] {
+  color-scheme: light;
+  --surface: #f5f1ea;
+  --text: #2a2621;
+  --muted: #7a736b;
+  --hairline: rgb(42 38 33 / 0.12);
+  --button-fill: #2a2621;
+  --button-text: #f5f1ea;
+  --hero-text: #f3efe6;
+  --overlay-tint: rgb(245 241 234 / 0.1);
+  --dim-target: #f5f1ea;
+  --media-co: var(--muted);
+  --contact-surface: var(--surface);
+  --contact-text: var(--text);
+  --contact-muted: var(--muted);
+  --contact-hairline: var(--hairline);
+  --contact-button-fill: var(--button-fill);
+  --contact-button-text: var(--button-text);
+}
+
+[data-theme="twilight"] {
+  color-scheme: dark;
+  --surface: #12100e;
+  --text: #efe6d6;
+  --muted: #a89880;
+  --hairline: rgb(239 230 214 / 0.12);
+  --button-fill: #efe6d6;
+  --button-text: #12100e;
+  --hero-text: #efe6d6;
+  --overlay-tint: rgb(40 24 8 / 0.22);
+  --dim-target: #12100e;
+  /* The one accent in the system: brass on "Media Co." only. */
+  --media-co: #c9a24a;
+  --contact-surface: var(--surface);
+  --contact-text: var(--text);
+  --contact-muted: var(--muted);
+  --contact-hairline: var(--hairline);
+  --contact-button-fill: var(--button-fill);
+  --contact-button-text: var(--button-text);
+}
+
+[data-theme="hobbs"] {
+  color-scheme: light;
+  --surface: #f7f4ee;
+  --text: #141414;
+  --muted: #7e8ca0;
+  --hairline: rgb(20 20 20 / 0.12);
+  --button-fill: #141414;
+  --button-text: #f7f4ee;
+  --hero-text: #f3efe6;
+  --overlay-tint: transparent;
+  --dim-target: #f7f4ee;
+  --media-co: var(--muted);
+  /* Sam's contact section is dark on his site. */
+  --contact-surface: #111214;
+  --contact-text: #f7f4ee;
+  --contact-muted: #7e8ca0;
+  --contact-hairline: rgb(247 244 238 / 0.12);
+  --contact-button-fill: #f7f4ee;
+  --contact-button-text: #111214;
+}
+
+/*
+ * The page background and scrollbar must match the theme surface (overscroll,
+ * pre-paint). `--muted` is scoped to [data-theme], so the html-level scrollbar
+ * color is spelled out per theme here (thumb = muted at 40%).
+ */
+html:has([data-theme="dark"]) {
+  background: #0b0d12;
+  color-scheme: dark;
+  scrollbar-color: rgb(140 155 176 / 0.4) transparent;
+}
+html:has([data-theme="light"]) {
+  background: #f5f1ea;
+  color-scheme: light;
+  scrollbar-color: rgb(122 115 107 / 0.4) transparent;
+}
+html:has([data-theme="twilight"]) {
+  background: #12100e;
+  color-scheme: dark;
+  scrollbar-color: rgb(168 152 128 / 0.4) transparent;
+}
+html:has([data-theme="hobbs"]) {
+  background: #f7f4ee;
+  color-scheme: light;
+  scrollbar-color: rgb(126 140 160 / 0.4) transparent;
+}
+
+/*
+ * prefers-color-scheme pairs dark and light only (16A), and only once a theme
+ * is chosen (`data-pair` is set by ThemeShell when launchTheme is set). The
+ * values repeat the two theme blocks above on purpose: CSS cannot alias one
+ * block to another, and the pairing must never leak into the review links.
+ */
+@media (prefers-color-scheme: light) {
+  [data-theme="dark"][data-pair] {
+    color-scheme: light;
+    --surface: #f5f1ea;
+    --text: #2a2621;
+    --muted: #7a736b;
+    --hairline: rgb(42 38 33 / 0.12);
+    --button-fill: #2a2621;
+    --button-text: #f5f1ea;
+    --hero-text: #f3efe6;
+    --overlay-tint: rgb(245 241 234 / 0.1);
+    --dim-target: #f5f1ea;
+  }
+  html:has([data-theme="dark"][data-pair]) {
+    background: #f5f1ea;
+    color-scheme: light;
+    scrollbar-color: rgb(122 115 107 / 0.4) transparent;
+  }
+}
+@media (prefers-color-scheme: dark) {
+  [data-theme="light"][data-pair] {
+    color-scheme: dark;
+    --surface: #0b0d12;
+    --text: #f3efe6;
+    --muted: #8c9bb0;
+    --hairline: rgb(255 255 255 / 0.12);
+    --button-fill: #f3efe6;
+    --button-text: #0b0d12;
+    --hero-text: #f3efe6;
+    --overlay-tint: rgb(20 30 50 / 0.25);
+    --dim-target: #0b0d12;
+  }
+  html:has([data-theme="light"][data-pair]) {
+    background: #0b0d12;
+    color-scheme: dark;
+    scrollbar-color: rgb(140 155 176 / 0.4) transparent;
+  }
+}

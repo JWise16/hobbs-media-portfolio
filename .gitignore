@@ -1,0 +1,27 @@
+# dependencies
+node_modules/
+# next
+.next/
+out/
+next-env.d.ts
+# vercel
+.vercel/
+# env
+.env*
+!.env.example
+# source footage is never committed (see README)
+clips/source/
+clips/preview/
+# encode temp and lock
+public/clips/.tmp-*/
+clips/sidecars/.encode.lock
+# tests
+test-results/
+playwright-report/
+blob-report/
+.context/
+# os
+.DS_Store
+*.log
+# typescript incremental cache
+*.tsbuildinfo
