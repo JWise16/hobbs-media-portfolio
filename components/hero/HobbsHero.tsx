@@ -3,7 +3,6 @@ import { copy, contactLinks, heroImage } from "@/content/site";
 import type { ThemeId } from "@/content/themes";
 import type { ClipEntry } from "@/lib/clips.types";
 import { workHref } from "@/lib/href";
-import { isReview } from "@/lib/stage";
 
 /**
  * Sam's Lovable hero rebuilt (the `hobbs` theme): a still (his photo, else
@@ -16,7 +15,6 @@ export function HobbsHero({ theme, clip }: { theme: ThemeId; clip: ClipEntry }) 
     <div className="hobbs-hero">
       <Image src={src} alt="" fill priority sizes="100vw" className="hobbs-hero-image" />
       <div className="hobbs-hero-scrim" aria-hidden="true" />
-      {isReview() && !heroImage && !clip.approved ? <span className="pending-tag">{copy.pending}</span> : null}
       <div className="content hobbs-hero-text">
         <p className="tracked kicker hobbs-hero-kicker">{copy.hobbsHero.kicker}</p>
         <h1 className="hobbs-hero-headline">{copy.hobbsHero.headline}</h1>

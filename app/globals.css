@@ -14,8 +14,6 @@
   --color-media-co: var(--media-co);
   --color-on-footage: var(--on-footage);
   --color-on-footage-muted: var(--on-footage-muted);
-  --color-pending: var(--pending);
-  --color-pending-bg: var(--pending-bg);
   --font-display: var(--font-display), "Instrument Serif", Georgia, serif;
   --font-support: var(--font-support), "Satoshi", "Manrope", system-ui, sans-serif;
 }
@@ -238,19 +236,4 @@
     align-items: center;
   }
 
-  .pending-tag {
-    position: absolute;
-    top: 12px;
-    left: 12px;
-    z-index: 3;
-    background: var(--pending-bg);
-    color: var(--pending);
-    padding: 6px 10px;
-    font-family: var(--font-support);
-    font-size: 0.625rem;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    font-weight: 500;
-    line-height: 1;
-  }
 }

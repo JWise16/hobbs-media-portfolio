@@ -5,10 +5,6 @@
  */
 
 :root {
-  /* Review-only PENDING tag, same in every theme. */
-  --pending: #c9a24a;
-  --pending-bg: rgb(0 0 0 / 0.6);
-
   /* Scrims that keep text legible over footage (1A). */
   --scrim-radial: radial-gradient(ellipse 60% 50% at 50% 50%, rgb(0 0 0 / 0.35), transparent);
   --scrim-bottom: linear-gradient(to top, rgb(0 0 0 / 0.55), rgb(0 0 0 / 0) 45%);

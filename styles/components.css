@@ -153,10 +153,6 @@
 .hero-cue .tracked {
   letter-spacing: 0.3em;
 }
-.hero-pending {
-  top: calc(env(safe-area-inset-top, 0px) + 12px);
-  opacity: calc(1 - var(--pe));
-}
 
 /* Tap-to-play affordance: visible when blocked or user-paused (5A, 6B). */
 .affordance {

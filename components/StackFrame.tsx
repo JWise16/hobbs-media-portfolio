@@ -11,18 +11,18 @@ export interface StackFrameProps {
   title: string;
   subtitle: string;
   tag: string;
-  pending: boolean;
-  pendingLabel: string;
 }
 
 /**
- * One selected-work frame (design A, 5A, 6B, 16A). The video starts with
+ * One selected-work frame (design A, 5A, 6B, 16A). Approval state is not
+ * shown in the UI (Jonny's call, 2026-09-22); the guard report is where
+ * unapproved clips are listed. The video starts with
  * preload="none", no src, no poster attribute; the poster is a lazy <img>
  * overlay. The VideoBudget assigns src within one viewport and plays only the
  * clip closest to the viewport center. The frame is focusable; tap or Space
  * toggles a user pause with no visible chrome beyond the affordance.
  */
-export function StackFrame({ clip, title, subtitle, tag, pending, pendingLabel }: StackFrameProps) {
+export function StackFrame({ clip, title, subtitle, tag }: StackFrameProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
@@ -73,7 +73,6 @@ export function StackFrame({ clip, title, subtitle, tag, pending, pendingLabel }
           style={{ objectPosition: focalToObjectPosition(clip.focal) }}
         />
         <div className="frame-scrim" aria-hidden="true" />
-        {pending ? <span className="pending-tag">{pendingLabel}</span> : null}
         <span className="chip frame-chip">{tag}</span>
         <figcaption className="frame-caption">
           <h3 className="frame-title">{title}</h3>

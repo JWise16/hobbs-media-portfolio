@@ -9,7 +9,6 @@ import type { ThemeId } from "@/content/themes";
 import type { ClipEntry } from "@/lib/clips.types";
 import { heroVideoId } from "@/lib/heroIsland";
 import type { Plaque as PlaqueLines } from "@/lib/plaque";
-import { isReview } from "@/lib/stage";
 
 export interface HeroProps {
   theme: ThemeId;
@@ -64,7 +63,6 @@ export function Hero({ theme, clip, plaque, variant, title }: HeroProps) {
         </div>
         <TapAffordance />
       </div>
-      {isReview() && !clip.approved ? <span className="pending-tag hero-pending">{copy.pending}</span> : null}
       <div className="hero-cue" aria-hidden="true">
         <span className="tracked tracked-xs">{copy.scrollCue}</span>
         <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.25" aria-hidden="true">

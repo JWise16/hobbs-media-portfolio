@@ -188,10 +188,6 @@
   background: var(--contact-surface);
   overflow: hidden;
 }
-.hobbs-hero .pending-tag {
-  top: calc(var(--header-h) + 12px);
-  left: 20px;
-}
 .hobbs-hero-image {
   object-fit: cover;
 }

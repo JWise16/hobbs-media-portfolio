@@ -121,7 +121,6 @@ export const copy = {
   },
   scrollCue: "Scroll",
   tapToPlay: "Tap to play",
-  pending: "Pending",
   preparedFor: "Prepared for",
   selectedWork: "Selected work",
 } as const;

@@ -89,12 +89,12 @@ test.describe("routes, metadata, caching", () => {
     }
   });
 
-  test("selected work renders every entry with title, tracked subtitle, short-form tag, and PENDING in review", async ({ page }) => {
+  test("selected work renders every entry with title, tracked subtitle, short-form tag, and no approval chrome", async ({ page }) => {
     await page.goto("/dark");
     const frames = page.locator(".frame");
     expect(await frames.count()).toBe(8);
     await expect(frames.first().locator(".chip")).toHaveText("AERIAL");
-    await expect(frames.first().locator(".pending-tag")).toHaveText(/pending/i);
+    expect(await page.locator(".pending-tag").count()).toBe(0);
     await expect(frames.first().locator(".frame-title")).not.toBeEmpty();
   });
 

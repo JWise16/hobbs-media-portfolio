@@ -5,7 +5,6 @@ import { copy } from "@/content/site";
 import { themes, type ThemeId } from "@/content/themes";
 import { vocabulary } from "@/content/vocabulary";
 import { work } from "@/content/work";
-import { isReview } from "@/lib/stage";
 
 /**
  * Selected work (mockups A and J, design 4A, 5A, 11A, 14A). A vertical stack
@@ -16,7 +15,6 @@ import { isReview } from "@/lib/stage";
 export function WorkStack({ theme }: { theme: ThemeId }) {
   if (work.length === 0) return <div id="work" />;
   const t = themes[theme];
-  const review = isReview();
   return (
     <section id="work" className="section content" aria-labelledby="work-heading">
       {t.kickers ? <p className="tracked kicker">{copy.work.kicker}</p> : null}
@@ -36,8 +34,6 @@ export function WorkStack({ theme }: { theme: ThemeId }) {
                 title={item.title}
                 subtitle={item.subtitle}
                 tag={tag}
-                pending={review && !clip.approved}
-                pendingLabel={copy.pending}
               />
             );
           }
