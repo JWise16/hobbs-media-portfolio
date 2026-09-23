@@ -17,18 +17,6 @@ Planning-stage TODOs for the Hobbs Media Co. portfolio site. Moved into
 **Priority:** P1
 **Depends on:** Sam's footage encoded; two iPhones
 
-### Re-render the mobile hero mockup from a real 9:16 crop (D15)
-
-**What:** Regenerate `docs/designs/mockups/variant-D.png` from the `clips/preview/<id>.<hash>.preview-916.jpg` crop of the chosen hero clip before the links go to Sam.
-
-**Why:** The approved mockup shows an imagined composition; the site shows a real cover crop chosen by the manifest `focal`. Sam should see the crop the site will actually show.
-
-**Context:** The encode script already emits the preview crop for every 16:9 clip. Deferred from plan: docs/designs/hobbs-media-portfolio.md (D15). Blocked on real footage.
-
-**Effort:** S
-**Priority:** P1
-**Depends on:** Sam's footage encoded
-
 ### Bind the guard to `next build` itself
 
 **What:** Run the SITE_STAGE / placeholder / approval guard from inside the Next build (a `next.config.ts` phase hook or an instrumentation entry) rather than only from the npm `prebuild` lifecycle.
@@ -91,4 +79,16 @@ Planning-stage TODOs for the Hobbs Media Co. portfolio site. Moved into
 
 ## Completed
 
-_(none yet)_
+### Re-render the mobile hero mockup from a real 9:16 crop (D15)
+
+**What:** Regenerate `docs/designs/mockups/variant-D.png` from the `clips/preview/<id>.<hash>.preview-916.jpg` crop of the chosen hero clip before the links go to Sam.
+
+**Why:** The approved mockup shows an imagined composition; the site shows a real cover crop chosen by the manifest `focal`. Sam should see the crop the site will actually show.
+
+**Context:** The encode script already emits the preview crop for every 16:9 clip. Deferred from plan: docs/designs/hobbs-media-portfolio.md (D15). Blocked on real footage.
+
+**Effort:** S
+**Priority:** P1
+**Depends on:** Sam's footage encoded
+**Completed:** v0.1.0.0 (2026-09-22): `docs/designs/mockups/variant-D.png` is now a screenshot of the `/dark` hero on an iPhone 14 viewport with the real sailboat crop.
+

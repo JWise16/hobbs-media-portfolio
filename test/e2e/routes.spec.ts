@@ -92,7 +92,7 @@ test.describe("routes, metadata, caching", () => {
   test("selected work renders every entry with title, tracked subtitle, short-form tag, and PENDING in review", async ({ page }) => {
     await page.goto("/dark");
     const frames = page.locator(".frame");
-    expect(await frames.count()).toBe(4);
+    expect(await frames.count()).toBe(7);
     await expect(frames.first().locator(".chip")).toHaveText("AERIAL");
     await expect(frames.first().locator(".pending-tag")).toHaveText(/pending/i);
     await expect(frames.first().locator(".frame-title")).not.toBeEmpty();

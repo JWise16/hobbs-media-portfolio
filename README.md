@@ -28,9 +28,11 @@ Sam's raw footage lives in a shared folder Sam owns, mirrored to a local drive:
 - Shared folder: _to be filled in when Sam shares it_
 - Local mirror: set `CLIPS_SOURCE_DIR` in `.env.local` (default `clips/source/`, gitignored)
 
-Until real footage lands, `clips/placeholders.sh` generates synthetic gradient
-sources so the pipeline and the site have something to play. They are never
-approved and never ship.
+Sam's first clips (iCloud copies at 1280x720) are in `clips/source/` locally
+and encoded into `public/clips/`. They are unapproved until Sam confirms each
+one. For launch, replace them with the camera originals (4K): the 1080 rung is
+an upscale until then. `clips/placeholders.sh` still generates synthetic
+sources if the pipeline needs exercising without footage.
 
 ## Encode workflow (manifest edit to deployed clip in under ten minutes)
 

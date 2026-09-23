@@ -25,7 +25,7 @@ describe("guard report (T6, T2, 17A)", () => {
     expect(r.ok).toBe(true);
     expect(r.todos.length).toBeGreaterThan(10);
     expect(r.todos.map((t) => t.label)).toContain("contact.phone");
-    expect(r.unapprovedClips).toContain("placeholder-dusk");
+    expect(r.unapprovedClips).toContain("sailboat-sunset");
     expect(r.limitViolations).toEqual([]);
     expect(r.plaqueLimitViolations).toEqual([]);
     expect(r.lines.join("\n")).toContain("OK for review");
@@ -38,7 +38,7 @@ describe("guard report (T6, T2, 17A)", () => {
     expect(text).toContain("FAIL: SITE_STAGE=live refuses");
     expect(text).toContain("contact.phone");
     expect(text).toContain("stats.homes");
-    expect(text).toContain("placeholder-dusk");
+    expect(text).toContain("sailboat-sunset");
   });
 
   it("live also requires an absolute SITE_URL for og:image links", async () => {

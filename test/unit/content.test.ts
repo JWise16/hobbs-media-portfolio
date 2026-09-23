@@ -42,7 +42,7 @@ describe("OG plaque line (10A)", () => {
   it("home carries the trade; share links carry the personalization", () => {
     expect(ogPlaqueLine({ kind: "home" }).line).toBe("REAL ESTATE PHOTO·FILM·AERIAL");
     expect(ogPlaqueLine({ kind: "agent", slug: "jessica" }).line).toBe("PREPARED FOR JESSICA TRAN");
-    expect(ogPlaqueLine({ kind: "property", slug: "ocean-ave" })).toMatchObject({ clipId: "placeholder-harbor", line: "1234 OCEAN AVE · FOR JESSICA TRAN" });
+    expect(ogPlaqueLine({ kind: "property", slug: "ocean-ave" })).toMatchObject({ clipId: "yacht-dusk-wake", line: "1234 OCEAN AVE · FOR JESSICA TRAN" });
   });
 });
 

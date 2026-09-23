@@ -18,7 +18,7 @@ describe("site/routes + site/og fallbacks", () => {
     const home = ogPlaqueLine({ kind: "home" });
     expect(ogPlaqueLine({ kind: "agent", slug: "nobody" })).toEqual(home);
     expect(ogPlaqueLine({ kind: "property", slug: "nowhere" })).toEqual(home);
-    expect(home.clipId).toBe("placeholder-dusk");
+    expect(home.clipId).toBe("sailboat-sunset");
   });
 
   it("readFont rejects with a named error when a file is missing and returns bytes otherwise; posterDataUrl inlines the poster; OG factories bind the static params", async () => {
@@ -28,7 +28,7 @@ describe("site/routes + site/og fallbacks", () => {
       expect(buf).toBeInstanceOf(ArrayBuffer);
       expect(buf.byteLength).toBeGreaterThan(1000);
     }
-    const url = await posterDataUrl(clips["placeholder-dusk"].files.poster_1920);
+    const url = await posterDataUrl(clips["sailboat-sunset"].files.poster_1920);
     expect(url.startsWith("data:image/jpeg;base64,")).toBe(true);
     expect(url.length).toBeGreaterThan(1000);
     await expect(posterDataUrl("/clips/missing.jpg")).rejects.toThrow();

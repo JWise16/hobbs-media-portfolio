@@ -22,7 +22,7 @@ export const properties: Property[] = [
     slug: "ocean-ave",
     title: todo("properties.ocean-ave.title", "1234 Ocean Ave"),
     subtitle: todo("properties.ocean-ave.subtitle", "Aerial film"),
-    reel: "placeholder-harbor",
+    reel: "yacht-dusk-wake",
     agent: "jessica",
   },
 ];

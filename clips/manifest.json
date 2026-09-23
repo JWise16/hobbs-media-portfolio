@@ -1,46 +1,130 @@
 {
   "clips": [
     {
-      "id": "placeholder-dusk",
-      "source": "placeholder-dusk.mp4",
-      "in": 0,
-      "out": 8,
+      "id": "sailboat-sunset",
+      "source": "sailboat-sunset.mp4",
+      "in": 4.8,
+      "out": 10.2,
       "speed": 1,
-      "focal": { "x": 0.5, "y": 0.45 },
-      "loop": "xfade",
+      "focal": {
+        "x": 0.6,
+        "y": 0.45
+      },
+      "loop": "pingpong",
       "ratio": "16:9",
       "hero": true,
       "approved": false
     },
     {
-      "id": "placeholder-harbor",
-      "source": "placeholder-harbor.mp4",
-      "in": 0,
-      "out": 8,
+      "id": "needle-above-clouds",
+      "source": "needle-above-clouds.mp4",
+      "in": 20.5,
+      "out": 31.5,
       "speed": 1,
-      "focal": { "x": 0.5, "y": 0.5 },
-      "loop": "xfade",
+      "focal": {
+        "x": 0.5,
+        "y": 0.45
+      },
+      "loop": "none",
+      "ratio": "16:9",
+      "hero": true,
+      "approved": false
+    },
+    {
+      "id": "yacht-dusk-wake",
+      "source": "yacht-dusk-wake.mp4",
+      "in": 0.3,
+      "out": 9.1,
+      "speed": 1,
+      "focal": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "loop": "none",
+      "ratio": "16:9",
+      "hero": true,
+      "approved": false
+    },
+    {
+      "id": "point-sunset",
+      "source": "point-sunset.mp4",
+      "in": 21,
+      "out": 30,
+      "speed": 1,
+      "focal": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "loop": "none",
       "ratio": "16:9",
       "approved": false
     },
     {
-      "id": "placeholder-rise",
-      "source": "placeholder-rise.mp4",
-      "in": 0,
-      "out": 4,
+      "id": "marina-skyline",
+      "source": "marina-skyline.mp4",
+      "in": 22,
+      "out": 33,
       "speed": 1,
-      "focal": { "x": 0.5, "y": 0.5 },
+      "focal": {
+        "x": 0.6,
+        "y": 0.5
+      },
+      "loop": "none",
+      "ratio": "16:9",
+      "approved": false
+    },
+    {
+      "id": "yacht-dusk-side",
+      "source": "yacht-dusk-side.mp4",
+      "in": 0,
+      "out": 8,
+      "speed": 1,
+      "focal": {
+        "x": 0.5,
+        "y": 0.6
+      },
+      "loop": "none",
+      "ratio": "16:9",
+      "approved": false
+    },
+    {
+      "id": "city-rise",
+      "source": "city-rise.mp4",
+      "in": 0,
+      "out": 4.4,
+      "speed": 1,
+      "focal": {
+        "x": 0.5,
+        "y": 0.35
+      },
       "loop": "pingpong",
       "ratio": "16:9",
       "approved": false
     },
     {
-      "id": "placeholder-sound",
-      "source": "placeholder-sound.mp4",
+      "id": "spit-golden-hour",
+      "source": "spit-golden-hour.mp4",
       "in": 0,
-      "out": 8,
+      "out": 10,
       "speed": 1,
-      "focal": { "x": 0.6, "y": 0.5 },
+      "focal": {
+        "x": 0.4,
+        "y": 0.5
+      },
+      "loop": "none",
+      "ratio": "16:9",
+      "approved": false
+    },
+    {
+      "id": "tug-daylight",
+      "source": "tug-daylight.mp4",
+      "in": 0.5,
+      "out": 8.5,
+      "speed": 1,
+      "focal": {
+        "x": 0.5,
+        "y": 0.4
+      },
       "loop": "none",
       "ratio": "16:9",
       "approved": false
