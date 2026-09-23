@@ -73,6 +73,22 @@ describe("decide", () => {
     expect(after.get("hero")).toBe("keep");
   });
 
+  it("a tapped (pinned) clip wins over the closest clip and over hero priority while it stays in view", () => {
+    const items = [
+      item({ id: "hero", kind: "hero", state: "attached", centerOffset: 0 }),
+      item({ id: "a", state: "attached", centerOffset: 10 }),
+      item({ id: "b", state: "playing", centerOffset: 300, pinned: true }),
+    ];
+    const out = decide(items, ctx({ scrollProgress: 0.2 }));
+    expect(out.get("b")).toBe("keep");
+    expect(out.get("hero")).toBe("keep");
+    expect(out.get("a")).toBe("keep");
+    // Out of view, the pin no longer counts (the controller clears it; the policy ignores non-intersecting items anyway).
+    const gone = decide([...items.slice(0, 2), { ...items[2], distance: 0.5 }], ctx({ scrollProgress: 1 }));
+    expect(gone.get("hero")).toBe("play"); // closest to center again
+    expect(gone.get("b")).toBe("pause"); // the pinned clip lost the slot once it left the viewport
+  });
+
   it("hero wins ties at progress 1", () => {
     const items = [item({ id: "hero", kind: "hero", state: "attached", centerOffset: 10 }), item({ id: "s", state: "attached", centerOffset: 10 })];
     expect(decide(items, ctx({ scrollProgress: 1 })).get("hero")).toBe("play");

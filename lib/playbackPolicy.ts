@@ -118,6 +118,8 @@ export interface PolicyItem {
   state: BudgetState;
   /** Tap-to-pause (6B). Stays paused until tapped again. */
   userPaused: boolean;
+  /** Started by a tap (a blocked or errored clip retried): wins while it stays in view. */
+  pinned?: boolean;
 }
 
 export interface PolicyContext {
@@ -137,7 +139,8 @@ export const RELEASE_BEYOND_VIEWPORTS = 2;
  *  - reduced motion: nothing plays; stack videos stay detached (posters only).
  *  - attach within one viewport, release beyond two; in between keep as-is.
  *  - exactly one plays: the intersecting, attached, unpaused, unblocked video
- *    closest to the viewport center. The hero wins while scrollProgress < 1.
+ *    closest to the viewport center. A clip the user started by tapping wins
+ *    while it stays in view; otherwise the hero wins while scrollProgress < 1.
  *  - hidden tab: everything pauses.
  */
 export function decide(items: PolicyItem[], ctx: PolicyContext): Map<string, PolicyAction> {
@@ -176,8 +179,8 @@ export function decide(items: PolicyItem[], ctx: PolicyContext): Map<string, Pol
   const candidates = items.filter(
     (it) => attached.has(it.id) && it.distance === 0 && !it.userPaused && it.state !== "blocked",
   );
-  let winner: PolicyItem | undefined;
-  if (ctx.scrollProgress < 1) winner = candidates.find((it) => it.kind === "hero");
+  let winner: PolicyItem | undefined = candidates.find((it) => it.pinned);
+  if (!winner && ctx.scrollProgress < 1) winner = candidates.find((it) => it.kind === "hero");
   if (!winner) {
     winner = candidates.reduce<PolicyItem | undefined>((best, it) => {
       if (!best) return it;

@@ -161,6 +161,13 @@ describe("guard report branches", () => {
     const r = await runGuard({ SITE_STAGE: "review" });
     expect(r.ok).toBe(false);
     expect(r.integrity.some((m) => m.startsWith("clips/manifest.json clips.0.approved"))).toBe(true);
-    expect(entryHash(manifest.default.clips[0] as never)).toMatch(/^[0-9a-f]{8}$/);
+  });
+
+  it("the guard and the encoder hash the manifest entry the same way", async () => {
+    const manifest = await realManifest();
+    const real = await realIndex();
+    const { parseManifest } = await import("@/scripts/encode");
+    const parsed = parseManifest(manifest.default);
+    for (const entry of parsed.clips) expect(entryHash(entry)).toBe(real.clips[entry.id as keyof typeof real.clips].entryHash);
   });
 });

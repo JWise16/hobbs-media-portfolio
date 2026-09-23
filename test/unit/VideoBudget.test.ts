@@ -36,11 +36,13 @@ function fakeVideo(top: number, height = 400, playResult: "ok" | "reject" = "ok"
 const flush = () => new Promise((r) => setTimeout(r, 0));
 
 const OriginalImage = window.Image;
+const OriginalRaf = window.requestAnimationFrame;
 
 beforeEach(() => {
   document.body.innerHTML = "";
   mediaFlags = {};
   (window as unknown as { Image: unknown }).Image = OriginalImage;
+  window.requestAnimationFrame = OriginalRaf;
   window.matchMedia = vi.fn((q: string) => ({ matches: !!mediaFlags[q], addEventListener() {}, removeEventListener() {} }) as unknown as MediaQueryList);
   Object.defineProperty(window, "innerHeight", { value: 800, configurable: true });
   Object.defineProperty(document, "visibilityState", { value: "visible", configurable: true });
@@ -253,6 +255,17 @@ describe("VideoBudget", () => {
     expect(other.pause).toHaveBeenCalled();
     expect(b.states().filter((s) => s.state === "playing")).toHaveLength(1);
     expect(blocked.el.getAttribute("data-state")).toBe("playing");
+    // The reconcile keeps the tapped clip, even though the other is just as close.
+    other.play.mockClear();
+    b.update();
+    await flush();
+    expect(other.play).not.toHaveBeenCalled();
+    expect(blocked.el.getAttribute("data-state")).toBe("playing");
+    // Scrolling it out of view releases the pin.
+    blocked.rect = { top: 2000, bottom: 2400 };
+    b.update();
+    await flush();
+    expect(other.el.getAttribute("data-state")).toBe("playing");
   });
 
   it("a hidden tab pauses synchronously without waiting for an animation frame", async () => {

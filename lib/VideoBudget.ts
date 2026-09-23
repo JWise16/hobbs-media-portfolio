@@ -45,6 +45,8 @@ interface Entry extends Registration {
   errored: boolean;
   /** The 1080 rung failed and the 720 rung was substituted once. */
   fellBack: boolean;
+  /** Started by a tap; wins the slot while it stays in view (cleared when it leaves). */
+  pinned: boolean;
   onError: () => void;
   onPause: () => void;
 }
@@ -110,6 +112,7 @@ export class VideoBudget {
       playToken: 0,
       errored: false,
       fellBack: false,
+      pinned: false,
       onError: () => {
         // A broken 1080 file falls back to the 720 rung once (the island does the same pre-hydration).
         if (el.getAttribute("data-rung") === "1080" && !entry.fellBack) {
@@ -183,7 +186,12 @@ export class VideoBudget {
       }
       for (const other of this.entries.values()) {
         if (other !== entry && other.state === "playing") this.pause(other);
+        other.pinned = false;
       }
+      // The tapped clip keeps the slot on the next reconcile; otherwise the
+      // policy would hand it straight back to the closest clip (and, under Low
+      // Power Mode, that replay would be refused and nothing would play).
+      entry.pinned = true;
       this.play(entry);
       this.schedule();
       return false;
@@ -212,6 +220,7 @@ export class VideoBudget {
     for (const e of this.entries.values()) {
       const rect = e.rect ? e.rect() : e.el.getBoundingClientRect();
       const m = measure(rect, vh);
+      if (m.distance > 0) e.pinned = false;
       items.push({
         id: e.id,
         kind: e.kind,
@@ -220,6 +229,7 @@ export class VideoBudget {
         // An errored element never wins; it keeps its poster until a tap retries.
         state: e.errored && e.state !== "detached" ? "blocked" : e.state,
         userPaused: e.userPaused,
+        pinned: e.pinned,
       });
     }
     const actions = decide(items, {
