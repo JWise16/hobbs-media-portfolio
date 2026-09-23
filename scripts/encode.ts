@@ -268,6 +268,12 @@ export function stableStringify(value: unknown): string {
   return JSON.stringify(value);
 }
 
+/** Fingerprint of the manifest entry alone (everything but `approved`); the guard recomputes it at build. */
+export function entryHash(entry: Omit<ManifestEntry, "approved"> & { approved?: boolean }): string {
+  const { approved: _approved, ...content } = entry;
+  return createHash("sha256").update(stableStringify(content)).digest("hex").slice(0, 8);
+}
+
 export function contentHash(sourceHash: string, entry: ManifestEntry, preset: string): string {
   // `approved` is metadata, not content: flipping it must not re-encode.
   const { approved: _approved, ...content } = entry;
@@ -484,6 +490,14 @@ async function exists(file: string): Promise<boolean> {
   try {
     await fs.access(file);
     return true;
+  } catch {
+    return false;
+  }
+}
+
+async function nonEmpty(file: string): Promise<boolean> {
+  try {
+    return (await fs.stat(file)).size > 0;
   } catch {
     return false;
   }
@@ -743,7 +757,7 @@ export async function encode(opts: EncodeOptions = {}): Promise<EncodeSummary> {
 
       if (sidecar) {
         const allPresent = (
-          await Promise.all(Object.values(sidecar.files).map((url) => exists(path.join(o.outDir, path.basename(url)))))
+          await Promise.all(Object.values(sidecar.files).map((url) => nonEmpty(path.join(o.outDir, path.basename(url)))))
         ).every(Boolean);
         if (!allPresent) sidecar = null;
       }
@@ -762,6 +776,7 @@ export async function encode(opts: EncodeOptions = {}): Promise<EncodeSummary> {
       entries.push({
         id: pl.entry.id,
         hash: pl.hash,
+        entryHash: entryHash(pl.entry),
         ratio: pl.entry.ratio,
         focal: pl.entry.focal ?? { x: 0.5, y: 0.5 },
         loop: pl.entry.loop,
@@ -772,14 +787,16 @@ export async function encode(opts: EncodeOptions = {}): Promise<EncodeSummary> {
       });
     }
 
+    // Publish the new index first; only then garbage-collect the old generation,
+    // so a failure between the two never leaves an index pointing at deleted files.
+    await fs.mkdir(path.dirname(o.indexPath), { recursive: true });
+    await writeFileAtomic(o.indexPath, renderIndex(entries));
+    for (const e of entries) summary.index[e.id] = e;
+
     summary.pruned.push(...(await pruneDir(o.outDir, keep)));
     summary.pruned.push(...(await pruneDir(o.sidecarDir, keep)));
     summary.pruned.push(...(await pruneDir(o.previewDir, keep)));
     for (const name of summary.pruned) log(`- pruned ${name}`);
-
-    await fs.mkdir(path.dirname(o.indexPath), { recursive: true });
-    await writeFileAtomic(o.indexPath, renderIndex(entries));
-    for (const e of entries) summary.index[e.id] = e;
   } finally {
     await fs.rm(tmpDir, { recursive: true, force: true });
     await fs.rm(lockPath, { force: true });

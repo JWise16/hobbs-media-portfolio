@@ -6,6 +6,7 @@ export const clips = {
   "placeholder-dusk": {
       "id": "placeholder-dusk",
       "hash": "1e4a9c42",
+      "entryHash": "cde2fdbd",
       "ratio": "16:9",
       "focal": {
           "x": 0.5,
@@ -17,14 +18,15 @@ export const clips = {
       "hero": true,
       "files": {
           "mp4_720": "/clips/placeholder-dusk.1e4a9c42.720.mp4",
-          "poster": "/clips/placeholder-dusk.1e4a9c42.jpg",
           "mp4_1080": "/clips/placeholder-dusk.1e4a9c42.1080.mp4",
+          "poster": "/clips/placeholder-dusk.1e4a9c42.jpg",
           "poster_1920": "/clips/placeholder-dusk.1e4a9c42.poster.1920.jpg"
       }
   },
   "placeholder-harbor": {
       "id": "placeholder-harbor",
       "hash": "32bf96dc",
+      "entryHash": "c328c5f4",
       "ratio": "16:9",
       "focal": {
           "x": 0.5,
@@ -36,14 +38,15 @@ export const clips = {
       "hero": false,
       "files": {
           "mp4_720": "/clips/placeholder-harbor.32bf96dc.720.mp4",
-          "poster": "/clips/placeholder-harbor.32bf96dc.jpg",
           "mp4_1080": "/clips/placeholder-harbor.32bf96dc.1080.mp4",
+          "poster": "/clips/placeholder-harbor.32bf96dc.jpg",
           "poster_1920": "/clips/placeholder-harbor.32bf96dc.poster.1920.jpg"
       }
   },
   "placeholder-rise": {
       "id": "placeholder-rise",
       "hash": "7876e9c5",
+      "entryHash": "9858c5e8",
       "ratio": "16:9",
       "focal": {
           "x": 0.5,
@@ -55,14 +58,15 @@ export const clips = {
       "hero": false,
       "files": {
           "mp4_720": "/clips/placeholder-rise.7876e9c5.720.mp4",
-          "poster": "/clips/placeholder-rise.7876e9c5.jpg",
           "mp4_1080": "/clips/placeholder-rise.7876e9c5.1080.mp4",
+          "poster": "/clips/placeholder-rise.7876e9c5.jpg",
           "poster_1920": "/clips/placeholder-rise.7876e9c5.poster.1920.jpg"
       }
   },
   "placeholder-sound": {
       "id": "placeholder-sound",
       "hash": "530936d4",
+      "entryHash": "1acad18b",
       "ratio": "16:9",
       "focal": {
           "x": 0.6,
@@ -74,8 +78,8 @@ export const clips = {
       "hero": false,
       "files": {
           "mp4_720": "/clips/placeholder-sound.530936d4.720.mp4",
-          "poster": "/clips/placeholder-sound.530936d4.jpg",
           "mp4_1080": "/clips/placeholder-sound.530936d4.1080.mp4",
+          "poster": "/clips/placeholder-sound.530936d4.jpg",
           "poster_1920": "/clips/placeholder-sound.530936d4.poster.1920.jpg"
       }
   },

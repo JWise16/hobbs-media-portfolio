@@ -8,10 +8,15 @@
  *
  * Runs as `prebuild`, so `next build` on Vercel cannot skip it.
  */
+import fs from "node:fs/promises";
+import path from "node:path";
+import { loadEnvConfig } from "@next/env";
+import { manifestSchema } from "../clips/manifest.schema";
 import type { TodoEntry } from "../content/todo";
+import type { ClipEntry } from "../lib/clips.types";
 import type { LimitViolation } from "../lib/plaque";
 import { resolveStage, StageError, type SiteStage, type StageEnv } from "../lib/stage";
-import { loadDotEnv } from "./env";
+import { entryHash } from "./encode";
 import { isMain } from "./isMain";
 
 export interface GuardReport {
@@ -30,14 +35,20 @@ export interface GuardReport {
 
 export type GuardEnv = StageEnv;
 
+export interface GuardOptions {
+  /** Repo root; public/clips is checked on disk. Tests point this at a fixture. */
+  cwd?: string;
+}
+
 const SLUG_RE = /^[a-z0-9][a-z0-9-]*$/;
 
 /**
  * Evaluates every rule against the content modules (imported once per
  * process; tests that need different content mock the modules). Exported for tests.
  */
-export async function runGuard(env: GuardEnv = process.env): Promise<GuardReport> {
+export async function runGuard(env: GuardEnv = process.env, options: GuardOptions = {}): Promise<GuardReport> {
   const stage = resolveStage(env);
+  const cwd = options.cwd ?? process.cwd();
 
   const [{ todos }, site, { agents }, { properties }, { work }, { clips }, plaque, manifestModule] = await Promise.all([
     import("../content/todo"),
@@ -49,8 +60,8 @@ export async function runGuard(env: GuardEnv = process.env): Promise<GuardReport
     import("../lib/plaque"),
     import("../clips/manifest.json"),
   ]);
-  const index = clips as Record<string, { approved: boolean }>;
-  const manifest = (manifestModule as { default?: { clips: Array<{ id: string; approved?: boolean }> } }).default ?? (manifestModule as { clips: Array<{ id: string; approved?: boolean }> });
+  const index = clips as Record<string, ClipEntry>;
+  const rawManifest = (manifestModule as { default?: unknown }).default ?? manifestModule;
 
   const referenced = new Set<string>([site.heroClip]);
   for (const w of work) if ("clip" in w.media) referenced.add(w.media.clip);
@@ -58,20 +69,71 @@ export async function runGuard(env: GuardEnv = process.env): Promise<GuardReport
   const unapprovedClips = [...referenced].filter((id) => !index[id]?.approved);
 
   const integrity: string[] = [];
-  // The generated index is what the site reads; if it disagrees with the
-  // manifest, `npm run encode` was skipped after an edit.
-  const manifestIds = new Set(manifest.clips.map((c) => c.id));
-  for (const id of Object.keys(index)) if (!manifestIds.has(id)) integrity.push(`clips.generated.ts has "${id}" but clips/manifest.json does not: run npm run encode`);
-  for (const c of manifest.clips) {
-    if (!index[c.id]) integrity.push(`clips/manifest.json has "${c.id}" but clips.generated.ts does not: run npm run encode`);
-    else if (Boolean(c.approved) !== index[c.id].approved) integrity.push(`"${c.id}" approved=${Boolean(c.approved)} in the manifest but ${index[c.id].approved} in the index: run npm run encode`);
+
+  // The manifest goes through the same strict schema the encoder uses, so a
+  // quoted "false" or a typo can never fail open here.
+  const parsedManifest = manifestSchema.safeParse(rawManifest);
+  if (!parsedManifest.success) {
+    for (const i of parsedManifest.error.issues) integrity.push(`clips/manifest.json ${i.path.join(".") || "(root)"}: ${i.message}`);
+  } else {
+    // The generated index is what the site reads; if it disagrees with the
+    // manifest (ids, approval, or any edit field), `npm run encode` was skipped.
+    const manifest = parsedManifest.data;
+    const manifestIds = new Set(manifest.clips.map((c) => c.id));
+    for (const id of Object.keys(index)) if (!manifestIds.has(id)) integrity.push(`clips.generated.ts has "${id}" but clips/manifest.json does not: run npm run encode`);
+    for (const c of manifest.clips) {
+      const entry = index[c.id];
+      if (!entry) integrity.push(`clips/manifest.json has "${c.id}" but clips.generated.ts does not: run npm run encode`);
+      else if (c.approved !== entry.approved) integrity.push(`"${c.id}" approved=${c.approved} in the manifest but ${entry.approved} in the index: run npm run encode`);
+      else if (entryHash(c) !== entry.entryHash) integrity.push(`"${c.id}" was edited in the manifest after the last encode (in/out/speed/focal/loop/ratio/source): run npm run encode`);
+    }
   }
   for (const id of referenced) if (!index[id]) integrity.push(`referenced clip "${id}" is not in clips.generated.ts`);
-  const agentSlugs = new Set(agents.map((a) => a.slug));
-  for (const a of agents) if (!SLUG_RE.test(a.slug)) integrity.push(`agents[${a.slug}]: slug must be lowercase kebab-case`);
+
+  // Every file the index names must exist and be non-empty in public/, and at
+  // live nothing may sit in public/clips that the index does not name: an
+  // unapproved clip removed from the work list is otherwise still downloadable.
+  const named = new Set<string>();
+  for (const entry of Object.values(index)) {
+    for (const url of Object.values(entry.files)) {
+      const file = path.join(cwd, "public", url.replace(/^\//, ""));
+      named.add(path.basename(url));
+      try {
+        if ((await fs.stat(file)).size === 0) integrity.push(`${url} is empty on disk`);
+      } catch {
+        integrity.push(`${url} is named by clips.generated.ts but missing from public/ (forgot to commit the encode output?)`);
+      }
+    }
+  }
+  if (stage === "live") {
+    for (const [id, entry] of Object.entries(index)) if (!entry.approved) integrity.push(`"${id}" is unapproved but still in the publication set; remove it from the manifest and re-run npm run encode, or approve it`);
+    try {
+      for (const name of await fs.readdir(path.join(cwd, "public/clips"))) {
+        if (name.startsWith(".")) continue;
+        if (!named.has(name)) integrity.push(`public/clips/${name} is not named by clips.generated.ts and would ship anyway: run npm run encode (it prunes) or delete it`);
+      }
+    } catch {
+      integrity.push("public/clips is missing");
+    }
+  }
+
+  const agentSlugs = new Set<string>();
+  for (const a of agents) {
+    if (!SLUG_RE.test(a.slug)) integrity.push(`agents[${a.slug}]: slug must be lowercase kebab-case`);
+    if (agentSlugs.has(a.slug)) integrity.push(`agents: duplicate slug "${a.slug}" (the first entry would win silently)`);
+    agentSlugs.add(a.slug);
+  }
+  const propertySlugs = new Set<string>();
   for (const p of properties) {
     if (!SLUG_RE.test(p.slug)) integrity.push(`properties[${p.slug}]: slug must be lowercase kebab-case`);
+    if (propertySlugs.has(p.slug)) integrity.push(`properties: duplicate slug "${p.slug}" (the first entry would win silently)`);
+    propertySlugs.add(p.slug);
     if (p.agent && !agentSlugs.has(p.agent)) integrity.push(`properties[${p.slug}].agent "${p.agent}" does not match any agent slug`);
+  }
+  const workSlugs = new Set<string>();
+  for (const w of work) {
+    if (workSlugs.has(w.slug)) integrity.push(`work: duplicate slug "${w.slug}"`);
+    workSlugs.add(w.slug);
   }
 
   const launch: string[] = [];
@@ -158,7 +220,9 @@ export async function runGuard(env: GuardEnv = process.env): Promise<GuardReport
 }
 
 if (isMain(import.meta.url)) {
-  loadDotEnv();
+  // Load exactly the files `next build` loads (.env.production.local before
+  // .env.local before .env), so the guard judges the same SITE_STAGE the build renders.
+  loadEnvConfig(process.cwd(), false, { info: () => {}, error: console.error });
   runGuard()
     .then((r) => {
       console.log(r.lines.join("\n"));

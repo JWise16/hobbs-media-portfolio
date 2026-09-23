@@ -223,6 +223,60 @@ describe("VideoBudget", () => {
     warn.mockRestore();
   });
 
+  it("a stale pause event on an element that is playing again is ignored", async () => {
+    const b = budget();
+    const a = fakeVideo(100);
+    reg(b, a);
+    b.update();
+    b.update();
+    await flush();
+    expect(a.el.getAttribute("data-state")).toBe("playing");
+    a.el.dispatchEvent(new Event("pause")); // element reports paused=false: nothing to do
+    expect(a.el.getAttribute("data-state")).toBe("playing");
+    expect(a.play).toHaveBeenCalledTimes(1);
+  });
+
+  it("a gesture retry on a blocked clip pauses the current winner first (one decoder)", async () => {
+    const b = budget();
+    const blocked = fakeVideo(100, 400, "reject");
+    const other = fakeVideo(300);
+    reg(b, blocked);
+    reg(b, other);
+    b.update();
+    b.update();
+    await flush();
+    expect(blocked.el.getAttribute("data-state")).toBe("blocked");
+    expect(other.el.getAttribute("data-state")).toBe("playing");
+    blocked.play.mockImplementation(() => Promise.resolve());
+    b.toggle(blocked.el);
+    await flush();
+    expect(other.pause).toHaveBeenCalled();
+    expect(b.states().filter((s) => s.state === "playing")).toHaveLength(1);
+    expect(blocked.el.getAttribute("data-state")).toBe("playing");
+  });
+
+  it("a hidden tab pauses synchronously without waiting for an animation frame", async () => {
+    let frames = 0;
+    window.requestAnimationFrame = vi.fn((cb: FrameRequestCallback) => {
+      frames++;
+      setTimeout(() => cb(0), 0);
+      return frames;
+    });
+    const b = budget();
+    const a = fakeVideo(100);
+    reg(b, a);
+    b.update();
+    b.update();
+    await flush();
+    expect(a.el.getAttribute("data-state")).toBe("playing");
+    Object.defineProperty(document, "visibilityState", { value: "hidden", configurable: true });
+    const before = frames;
+    document.dispatchEvent(new Event("visibilitychange"));
+    expect(a.pause).toHaveBeenCalled();
+    expect(a.el.getAttribute("data-state")).toBe("attached");
+    expect(frames).toBe(before);
+  });
+
   it("play() rejection → BLOCKED with the affordance state; a tap retries", async () => {
     const b = budget();
     const a = fakeVideo(100, 400, "reject");

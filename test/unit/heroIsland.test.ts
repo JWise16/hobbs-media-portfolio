@@ -214,6 +214,33 @@ describe("heroInit (the inline script, executed standalone)", () => {
     expect(v.getAttribute("data-hero-state")).toBe("error");
   });
 
+  it("with the controller owning the element, a media error still wins over the pending rejection", async () => {
+    stubMatchMedia({});
+    stubImage(true);
+    let rejectIt: ((e: Error) => void) | null = null;
+    const v = makeVideo({ src: "/720.mp4", "data-src-720": "/720.mp4", poster: "/p.jpg", "data-hero-init": "0" }, () => new Promise<void>((_, rej) => (rejectIt = rej)));
+    heroInit(v);
+    await tick();
+    v.setAttribute("data-state", "attached"); // controller registered; island error handler steps aside
+    Object.defineProperty(v, "error", { value: { code: 4 }, configurable: true });
+    v.dispatchEvent(new Event("error"));
+    const notSupported = new Error("no supported sources");
+    notSupported.name = "NotSupportedError";
+    rejectIt!(notSupported);
+    await tick();
+    expect(v.getAttribute("data-hero-state")).toBe("error");
+  });
+
+  it("a poster that lands after the controller took over does not start playback on its own", async () => {
+    stubMatchMedia({});
+    stubImage(false); // poster loads asynchronously
+    const v = makeVideo({ src: "/720.mp4", poster: "/p.jpg", "data-hero-init": "0" }, () => Promise.resolve());
+    heroInit(v);
+    v.setAttribute("data-state", "paused"); // hydration + a user pause before the poster arrives
+    await tick();
+    expect(v.play).not.toHaveBeenCalled();
+  });
+
   it("a stale AbortError from the load() after the fallback never marks the hero blocked", async () => {
     stubMatchMedia({ "(min-width: 1024px)": true });
     stubImage(true);

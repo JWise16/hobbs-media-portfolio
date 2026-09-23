@@ -18,13 +18,14 @@ test.describe("routes, metadata, caching", () => {
     await expect(page.locator("main a.tracked[href='/dark']")).toHaveText(/hobbs media co\. home/i);
   });
 
-  test("every route is noindex in review; robots.txt disallows all", async ({ page, request }) => {
+  test("every route is noindex in review; robots.txt lets crawlers fetch pages so they can read it", async ({ page, request }) => {
     for (const path of ["/dark", "/hobbs", "/dark/for/jessica", "/dark/p/ocean-ave"]) {
       await page.goto(path);
       await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", /noindex/);
     }
-    const robots = await request.get("/robots.txt");
-    expect(await robots.text()).toMatch(/Disallow:\s*\//);
+    const robots = await (await request.get("/robots.txt")).text();
+    expect(robots).toMatch(/Allow:\s*\//);
+    expect(robots).not.toMatch(/Disallow:\s*\/\s*$/m);
   });
 
   test("OG routes return image/png and pages point at them", async ({ page, request }) => {

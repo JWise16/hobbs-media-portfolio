@@ -82,7 +82,8 @@ export class VideoBudget {
     this.desktop = w.matchMedia ? w.matchMedia(DESKTOP_QUERY) : null;
     w.addEventListener("scroll", this.schedule, { passive: true });
     w.addEventListener("resize", this.schedule, { passive: true });
-    w.document.addEventListener("visibilitychange", this.schedule);
+    // Hidden tabs stop receiving animation frames, so the pause must not wait for one.
+    w.document.addEventListener("visibilitychange", this.onVisibility);
     this.reduced?.addEventListener?.("change", this.schedule);
     this.schedule();
   }
@@ -91,7 +92,7 @@ export class VideoBudget {
     const w = this.win;
     w.removeEventListener("scroll", this.schedule);
     w.removeEventListener("resize", this.schedule);
-    w.document.removeEventListener("visibilitychange", this.schedule);
+    w.document.removeEventListener("visibilitychange", this.onVisibility);
     this.reduced?.removeEventListener?.("change", this.schedule);
     if (this.raf) w.cancelAnimationFrame(this.raf);
     for (const el of [...this.entries.keys()]) this.unregister(el);
@@ -171,15 +172,20 @@ export class VideoBudget {
     const entry = this.entries.get(el);
     if (!entry) return false;
     if (entry.state === "blocked" || entry.errored) {
-      // Blocked: the tap is the user gesture iOS wanted. Try again. An errored
-      // element needs a fresh resource selection, so its src is re-attached first.
+      // Blocked: the tap is the user gesture iOS wanted, so play() must run
+      // synchronously inside it. Keep the one-decoder budget by pausing every
+      // other playing entry first, then let the next frame reconcile.
       entry.userPaused = false;
       if (entry.errored) {
         entry.errored = false;
         el.removeAttribute("src");
         this.attach(entry);
       }
+      for (const other of this.entries.values()) {
+        if (other !== entry && other.state === "playing") this.pause(other);
+      }
       this.play(entry);
+      this.schedule();
       return false;
     }
     entry.userPaused = !entry.userPaused;
@@ -231,6 +237,19 @@ export class VideoBudget {
   }
 
   // ── internals ──────────────────────────────────────────────────────────────
+
+  private onVisibility = () => {
+    if (!this.started) return;
+    if (this.win.document.visibilityState === "hidden") {
+      if (this.raf) {
+        this.win.cancelAnimationFrame(this.raf);
+        this.raf = 0;
+      }
+      this.update();
+      return;
+    }
+    this.schedule();
+  };
 
   private schedule = () => {
     if (!this.started || this.raf) return;

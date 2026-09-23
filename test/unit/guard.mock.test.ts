@@ -1,12 +1,16 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { entryHash } from "@/scripts/encode";
 
 /**
- * The two guard branches the real content cannot reach: over-limit strings
- * (design 17A) and a fully clean live build. runGuard imports content
- * dynamically, so each scenario mocks the modules it needs and re-imports.
+ * The guard branches the real content cannot reach: over-limit strings
+ * (design 17A), duplicate slugs, a stale or malformed manifest, and a fully
+ * clean live build. runGuard imports content dynamically, so each scenario
+ * mocks the modules it needs and re-imports.
  */
 
 const MOCKED = ["@/content/agents", "@/content/properties", "@/content/work", "@/content/todo", "@/content/clips.generated", "@/clips/manifest.json"];
+
+type ManifestModule = { default: { clips: Array<Record<string, unknown>> } };
 
 async function guardWith(mocks: Record<string, () => Record<string, unknown>>) {
   vi.resetModules();
@@ -20,8 +24,28 @@ afterEach(() => {
   vi.resetModules();
 });
 
+async function realIndex() {
+  return vi.importActual<typeof import("@/content/clips.generated")>("@/content/clips.generated");
+}
+async function realManifest() {
+  return vi.importActual<ManifestModule>("@/clips/manifest.json");
+}
+
+/** The real generated index and manifest with every clip approved. */
+async function approvedEverything(except?: string): Promise<Record<string, () => Record<string, unknown>>> {
+  const real = await realIndex();
+  const manifest = await realManifest();
+  const clips = Object.fromEntries(Object.entries(real.clips).map(([id, c]) => [id, { ...c, approved: id !== except }]));
+  return {
+    "@/content/clips.generated": () => ({ clips, clipIds: Object.keys(clips) }),
+    "@/clips/manifest.json": () => ({ default: { clips: manifest.default.clips.map((c) => ({ ...c, approved: c.id !== except })) } }),
+  };
+}
+
+const noTodos = () => ({ todo: (_label: string, value: unknown) => value, todos: () => [], resetTodos: () => {} });
+
 describe("guard report branches", () => {
-  it("over-limit names, titles and composed plaque lines fail at review and name every string; image work items and reel-less properties are skipped", async () => {
+  it("over-limit names, titles and composed plaque lines fail at review and name every string; a dangling agent reference is an integrity error", async () => {
     const runGuard = await guardWith({
       "@/content/agents": () => ({
         agents: [{ slug: "long", displayName: "Alexandria Montgomery-Whitfield", brokerage: "Coldwell Banker Bain Seattle Eastside" }],
@@ -46,28 +70,46 @@ describe("guard report branches", () => {
     expect(text).toContain("Over-limit strings (design 17A):");
     expect(text).toContain('agents[long].displayName: "Alexandria Montgomery-Whitfield" is 31 characters (limit 24)');
     expect(text).toContain("FAIL: shorten the strings above.");
-    expect(text).not.toContain("FAIL: SITE_STAGE=live");
     expect(text).not.toContain("OK for review");
   });
 
-  it("live with nothing unconfirmed and every referenced clip approved passes, even under VERCEL_ENV=production", async () => {
+  it("duplicate agent, property and work slugs are rejected", async () => {
     const runGuard = await guardWith({
-      "@/content/todo": () => ({ todo: (_label: string, value: unknown) => value, todos: () => [], resetTodos: () => {} }),
-      "@/content/clips.generated": () => {
-        const ids = ["placeholder-dusk", "placeholder-harbor", "placeholder-rise", "placeholder-sound"];
-        return { clips: Object.fromEntries(ids.map((id) => [id, { id, approved: true }])), clipIds: ids };
-      },
-      "@/clips/manifest.json": () => {
-        const ids = ["placeholder-dusk", "placeholder-harbor", "placeholder-rise", "placeholder-sound"];
-        return { default: { clips: ids.map((id) => ({ id, approved: true })) } };
-      },
+      "@/content/agents": () => ({
+        agents: [
+          { slug: "jessica", displayName: "Jessica Tran", brokerage: "Windermere" },
+          { slug: "jessica", displayName: "Jessica Other", brokerage: "Redfin" },
+        ],
+      }),
+      "@/content/properties": () => ({
+        properties: [
+          { slug: "ocean-ave", title: "1234 Ocean Ave", subtitle: "Film", agent: "jessica" },
+          { slug: "ocean-ave", title: "9 Ocean Ave", subtitle: "Film", agent: "jessica" },
+        ],
+      }),
+      "@/content/work": () => ({
+        work: [
+          { slug: "a", title: "A", subtitle: "Film", tag: "drone", media: { clip: "placeholder-dusk" } },
+          { slug: "a", title: "B", subtitle: "Film", tag: "drone", media: { clip: "placeholder-harbor" } },
+        ],
+      }),
     });
+    const r = await runGuard({ SITE_STAGE: "review" });
+    expect(r.integrity).toEqual([
+      'agents: duplicate slug "jessica" (the first entry would win silently)',
+      'properties: duplicate slug "ocean-ave" (the first entry would win silently)',
+      'work: duplicate slug "a"',
+    ]);
+  });
+
+  it("live with nothing unconfirmed, every clip approved, and SITE_URL set passes, even under VERCEL_ENV=production", async () => {
+    const runGuard = await guardWith({ "@/content/todo": noTodos, ...(await approvedEverything()) });
     const r = await runGuard({ SITE_STAGE: "live", VERCEL_ENV: "production", SITE_URL: "https://hobbsmedia.co" });
+    expect(r.integrity).toEqual([]);
     expect(r.ok).toBe(true);
     expect(r.stage).toBe("live");
     expect(r.todos).toEqual([]);
     expect(r.unapprovedClips).toEqual([]);
-    expect(r.limitViolations).toEqual([]);
     const text = r.lines.join("\n");
     expect(text).toContain("Unconfirmed facts: none");
     expect(text).toContain("Unapproved clips referenced: none");
@@ -75,15 +117,27 @@ describe("guard report branches", () => {
     expect(text).not.toContain("FAIL");
   });
 
-  it("a generated index that disagrees with the manifest fails at every stage", async () => {
+  it("live refuses an unapproved clip that is still in the publication set even when nothing references it", async () => {
+    const runGuard = await guardWith({
+      "@/content/todo": noTodos,
+      "@/content/work": () => ({ work: [{ slug: "dusk", title: "Dusk", subtitle: "Film", tag: "drone", media: { clip: "placeholder-dusk" } }] }),
+      ...(await approvedEverything("placeholder-sound")),
+    });
+    const r = await runGuard({ SITE_STAGE: "live", SITE_URL: "https://hobbsmedia.co" });
+    expect(r.unapprovedClips).toEqual([]);
+    expect(r.ok).toBe(false);
+    expect(r.integrity).toEqual(['"placeholder-sound" is unapproved but still in the publication set; remove it from the manifest and re-run npm run encode, or approve it']);
+  });
+
+  it("a generated index that disagrees with the manifest fails at every stage: ids, approval, and edited fields", async () => {
+    const manifest = await realManifest();
+    const edited = manifest.default.clips.map((c) => (c.id === "placeholder-harbor" ? { ...c, out: 6 } : c));
     const runGuard = await guardWith({
       "@/clips/manifest.json": () => ({
         default: {
           clips: [
-            { id: "placeholder-dusk", approved: true },
-            { id: "placeholder-harbor", approved: false },
-            { id: "placeholder-rise", approved: false },
-            { id: "brand-new", approved: false },
+            ...edited.filter((c) => c.id !== "placeholder-sound").map((c) => (c.id === "placeholder-dusk" ? { ...c, approved: true } : c)),
+            { ...manifest.default.clips[0], id: "brand-new" },
           ],
         },
       }),
@@ -93,8 +147,20 @@ describe("guard report branches", () => {
     expect(r.integrity).toEqual([
       'clips.generated.ts has "placeholder-sound" but clips/manifest.json does not: run npm run encode',
       '"placeholder-dusk" approved=true in the manifest but false in the index: run npm run encode',
+      '"placeholder-harbor" was edited in the manifest after the last encode (in/out/speed/focal/loop/ratio/source): run npm run encode',
       'clips/manifest.json has "brand-new" but clips.generated.ts does not: run npm run encode',
     ]);
     expect(r.lines.join("\n")).toContain("FAIL: fix the content integrity problems above.");
+  });
+
+  it("a manifest that fails the strict schema (a quoted approval) is an integrity error, never a pass", async () => {
+    const manifest = await realManifest();
+    const runGuard = await guardWith({
+      "@/clips/manifest.json": () => ({ default: { clips: manifest.default.clips.map((c) => (c.id === "placeholder-dusk" ? { ...c, approved: "false" } : c)) } }),
+    });
+    const r = await runGuard({ SITE_STAGE: "review" });
+    expect(r.ok).toBe(false);
+    expect(r.integrity.some((m) => m.startsWith("clips/manifest.json clips.0.approved"))).toBe(true);
+    expect(entryHash(manifest.default.clips[0] as never)).toMatch(/^[0-9a-f]{8}$/);
   });
 });

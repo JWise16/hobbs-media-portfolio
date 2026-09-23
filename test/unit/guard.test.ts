@@ -54,9 +54,15 @@ describe("guard report (T6, T2, 17A)", () => {
     expect(good.lines.join("\n")).not.toContain("Launch requirements:");
   });
 
-  it("review: the manifest, the generated index, and the agent references agree", async () => {
+  it("review: the manifest, the generated index, the files on disk, and the agent references agree", async () => {
     const r = await runGuard({ SITE_STAGE: "review" });
     expect(r.integrity).toEqual([]);
+  });
+
+  it("files named by the index must exist and be non-empty under public/", async () => {
+    const r = await runGuard({ SITE_STAGE: "review" }, { cwd: "/nonexistent-root" });
+    expect(r.ok).toBe(false);
+    expect(r.integrity.some((m) => m.includes("missing from public/"))).toBe(true);
   });
 
   it("typo fails before any report", async () => {

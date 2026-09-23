@@ -48,7 +48,10 @@ export function heroInit(v: HTMLVideoElement): void {
           if (id !== attempt) return;
           if (err && err.name === "AbortError") return;
           // A media error owns the outcome (Chromium fires error before the NotSupportedError rejection).
-          if (v.error) return;
+          if (v.error) {
+            v.setAttribute("data-hero-state", "error");
+            return;
+          }
           v.setAttribute("data-hero-state", "blocked");
         },
       );
@@ -77,7 +80,9 @@ export function heroInit(v: HTMLVideoElement): void {
     return;
   }
   var start = function () {
-    if (started) return;
+    // A poster that lands after hydration must not restart a hero the page
+    // controller has paused: once it owns the element (data-state), it plays it.
+    if (started || v.hasAttribute("data-state")) return;
     started = true;
     v.setAttribute("preload", "auto");
     tryPlay();

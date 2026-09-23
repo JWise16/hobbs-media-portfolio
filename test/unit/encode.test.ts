@@ -297,6 +297,7 @@ describe("renderIndex", () => {
       {
         id: "sunset",
         hash: "deadbeef",
+        entryHash: "cafef00d",
         ratio: "16:9",
         focal: { x: 0.5, y: 0.5 },
         loop: "none",
@@ -407,6 +408,8 @@ describe("encode (real ffmpeg on the 2 s fixture)", () => {
     const index = fs.readFileSync(ws.indexPath, "utf8");
     expect(index).toContain(`"sunset": {`);
     expect(index).toContain(`"hash": "${sunset.hash}"`);
+    expect(sunset.entryHash).toMatch(/^[0-9a-f]{8}$/);
+    expect(s.index.rise.entryHash).not.toBe(sunset.entryHash);
 
     // rerun: nothing re-encoded
     const before = ws.calls.ffmpeg;

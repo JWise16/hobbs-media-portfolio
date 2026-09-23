@@ -30,6 +30,8 @@ export interface ClipEntry {
   id: string;
   /** Eight hex chars of the content hash; part of every output file name. */
   hash: string;
+  /** Eight hex chars over the manifest entry alone (no source, no encoder); the guard compares it to the manifest. */
+  entryHash: string;
   ratio: ClipRatio;
   focal: ClipFocal;
   loop: ClipLoop;
