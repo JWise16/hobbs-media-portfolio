@@ -65,7 +65,7 @@ describe("guard report branches", () => {
     expect(r.integrity).toEqual(['properties[orphan].agent "nobody" does not match any agent slug']);
     expect(r.limitViolations.map((v) => v.what)).toEqual(["agents[long].displayName", "agents[long].brokerage", "properties[orphan].title"]);
     expect(r.plaqueLimitViolations.map((v) => v.what)).toEqual(["/for/long plaque line 1", "/for/long plaque line 2", "/p/orphan plaque line 1"]);
-    expect(r.unapprovedClips).toEqual(["sailboat-sunset", "tug-daylight"]);
+    expect(r.unapprovedClips).toEqual(["yacht-dusk-wake", "tug-daylight"]);
     const text = r.lines.join("\n");
     expect(text).toContain("Over-limit strings (design 17A):");
     expect(text).toContain('agents[long].displayName: "Alexandria Montgomery-Whitfield" is 31 characters (limit 24)');

@@ -18,7 +18,7 @@ describe("site/routes + site/og fallbacks", () => {
     const home = ogPlaqueLine({ kind: "home" });
     expect(ogPlaqueLine({ kind: "agent", slug: "nobody" })).toEqual(home);
     expect(ogPlaqueLine({ kind: "property", slug: "nowhere" })).toEqual(home);
-    expect(home.clipId).toBe("sailboat-sunset");
+    expect(home.clipId).toBe("yacht-dusk-wake");
   });
 
   it("readFont rejects with a named error when a file is missing and returns bytes otherwise; posterDataUrl inlines the poster; OG factories bind the static params", async () => {

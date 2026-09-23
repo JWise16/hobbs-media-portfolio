@@ -19,7 +19,7 @@ test.describe("prefers-reduced-motion: posters only, normal flow", () => {
     const playing = await page.evaluate(() => [...document.querySelectorAll("video")].filter((v) => !v.paused).length);
     expect(playing).toBe(0);
     // The server-rendered hero src is metadata-only; nothing else is fetched.
-    expect(mp4s.filter((u) => !u.includes("sailboat-sunset"))).toEqual([]);
+    expect(mp4s.filter((u) => !u.includes("yacht-dusk-wake"))).toEqual([]);
   });
 
   test("calling card: contact sits directly beneath a static poster hero", async ({ page }) => {

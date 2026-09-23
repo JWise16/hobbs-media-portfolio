@@ -20,6 +20,13 @@ export interface WorkItem {
 
 export const work: WorkItem[] = [
   {
+    slug: "sailboat-sunset",
+    title: todo("work.sailboat-sunset.title", "Under Sail"),
+    subtitle: todo("work.sailboat-sunset.subtitle", "Aerial film · Puget Sound"),
+    tag: "drone",
+    media: { clip: "sailboat-sunset" },
+  },
+  {
     slug: "needle-above-clouds",
     title: todo("work.needle-above-clouds.title", "Above the Fog"),
     subtitle: todo("work.needle-above-clouds.subtitle", "Aerial film · Seattle"),
