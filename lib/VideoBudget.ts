@@ -45,8 +45,6 @@ interface Entry extends Registration {
   errored: boolean;
   /** The 1080 rung failed and the 720 rung was substituted once. */
   fellBack: boolean;
-  /** Set around our own pause() calls so the pause listener can tell them from browser-initiated pauses. */
-  pausing: boolean;
   onError: () => void;
   onPause: () => void;
 }
@@ -111,7 +109,6 @@ export class VideoBudget {
       playToken: 0,
       errored: false,
       fellBack: false,
-      pausing: false,
       onError: () => {
         // A broken 1080 file falls back to the 720 rung once (the island does the same pre-hydration).
         if (el.getAttribute("data-rung") === "1080" && !entry.fellBack) {
@@ -133,8 +130,11 @@ export class VideoBudget {
       },
       onPause: () => {
         // The browser paused it (Low Power Mode engaging, an interruption, Safari
-        // suspending offscreen media). Give the slot back so the policy can replay or reassign.
-        if (entry.pausing || entry.state !== "playing") return;
+        // suspending offscreen media). Give the slot back so the policy can replay
+        // or reassign. Our own pauses are invisible here because pauseElement()
+        // moves the state off "playing" synchronously, and the event arrives later.
+        // A play-once clip that reached its end holds its last frame (not a pause).
+        if (entry.state !== "playing" || !el.paused || el.ended) return;
         entry.playToken++;
         this.setState(entry, "attached");
         this.schedule();
@@ -266,15 +266,10 @@ export class VideoBudget {
     this.setState(e, e.userPaused ? "paused" : "attached");
   }
 
-  /** Our own pauses bump the token and are invisible to the pause listener. */
+  /** Our own pauses bump the token; the caller moves the state off "playing" right after. */
   private pauseElement(e: Entry): void {
     e.playToken++;
-    e.pausing = true;
-    try {
-      e.el.pause();
-    } finally {
-      e.pausing = false;
-    }
+    e.el.pause();
   }
 
   private detach(e: Entry): void {

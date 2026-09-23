@@ -195,6 +195,25 @@ describe("heroInit (the inline script, executed standalone)", () => {
     expect(v.getAttribute("data-hero-state")).toBe("error");
   });
 
+  it("a NotSupportedError rejection arriving after the final error never downgrades error to blocked", async () => {
+    stubMatchMedia({});
+    stubImage(true);
+    let rejectIt: ((e: Error) => void) | null = null;
+    const v = makeVideo(
+      { src: "/720.mp4", "data-src-720": "/720.mp4", poster: "/p.jpg", "data-hero-init": "0" },
+      () => new Promise<void>((_, rej) => (rejectIt = rej)),
+    );
+    heroInit(v);
+    await tick();
+    Object.defineProperty(v, "error", { value: { code: 4 }, configurable: true });
+    v.dispatchEvent(new Event("error"));
+    const notSupported = new Error("The element has no supported sources.");
+    notSupported.name = "NotSupportedError";
+    rejectIt!(notSupported);
+    await tick();
+    expect(v.getAttribute("data-hero-state")).toBe("error");
+  });
+
   it("a stale AbortError from the load() after the fallback never marks the hero blocked", async () => {
     stubMatchMedia({ "(min-width: 1024px)": true });
     stubImage(true);

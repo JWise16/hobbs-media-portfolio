@@ -14,13 +14,18 @@ let mediaFlags: Record<string, boolean> = {};
 function fakeVideo(top: number, height = 400, playResult: "ok" | "reject" = "ok"): Fake {
   const el = document.createElement("video");
   const rect = { top, bottom: top + height };
+  let paused = true;
+  Object.defineProperty(el, "paused", { get: () => paused, configurable: true });
   const play = vi.fn(() => {
+    paused = false;
     if (playResult === "ok") return Promise.resolve();
     const err = new Error("play() failed because the user didn't interact");
     err.name = "NotAllowedError";
     return Promise.reject(err);
   });
-  const pause = vi.fn();
+  const pause = vi.fn(() => {
+    paused = true;
+  });
   el.play = play as unknown as typeof el.play;
   el.pause = pause as unknown as typeof el.pause;
   el.load = vi.fn() as unknown as typeof el.load;
@@ -170,7 +175,8 @@ describe("VideoBudget", () => {
     b.update();
     await flush();
     expect(a.el.getAttribute("data-state")).toBe("playing");
-    a.el.dispatchEvent(new Event("pause")); // Low Power Mode engaging
+    a.el.pause(); // the browser pauses it (Low Power Mode engaging) …
+    a.el.dispatchEvent(new Event("pause")); // … and reports it
     expect(a.el.getAttribute("data-state")).toBe("attached");
     b.update();
     await flush();
@@ -180,6 +186,23 @@ describe("VideoBudget", () => {
     b.toggle(a.el);
     a.el.dispatchEvent(new Event("pause"));
     expect(a.el.getAttribute("data-state")).toBe("paused");
+  });
+
+  it("a play-once clip that reaches its end holds the last frame instead of replaying", async () => {
+    const b = budget();
+    const a = fakeVideo(100);
+    reg(b, a, "stack", { loop: false });
+    b.update();
+    b.update();
+    await flush();
+    expect(a.el.getAttribute("data-state")).toBe("playing");
+    Object.defineProperty(a.el, "ended", { value: true, configurable: true });
+    Object.defineProperty(a.el, "paused", { value: true, configurable: true });
+    a.el.dispatchEvent(new Event("pause"));
+    expect(a.el.getAttribute("data-state")).toBe("playing");
+    b.update();
+    await flush();
+    expect(a.play).toHaveBeenCalledTimes(1);
   });
 
   it("a tap on an errored clip re-attaches the src before retrying; a hero error is reported on the island state", async () => {

@@ -47,6 +47,8 @@ export function heroInit(v: HTMLVideoElement): void {
         function (err) {
           if (id !== attempt) return;
           if (err && err.name === "AbortError") return;
+          // A media error owns the outcome (Chromium fires error before the NotSupportedError rejection).
+          if (v.error) return;
           v.setAttribute("data-hero-state", "blocked");
         },
       );
@@ -67,6 +69,7 @@ export function heroInit(v: HTMLVideoElement): void {
       if (started) tryPlay();
       return;
     }
+    attempt++;
     v.setAttribute("data-hero-state", "error");
   });
   if (mm && mm.call(win, "(prefers-reduced-motion: reduce)").matches) {
