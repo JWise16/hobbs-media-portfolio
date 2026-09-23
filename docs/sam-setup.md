@@ -21,29 +21,27 @@ except the domain name.
 
 ## 3. Domain name (the web address)
 
-1. Decide the name (for example `hobbsmedia.co` or `hobbsmediaco.com`). Check
-   what is available at https://www.namecheap.com or https://porkbun.com.
-   Expect 10 to 40 dollars a year. Buy it under your own name and email.
-2. Turn off any "free website builder" or "parking page" upsell. You only need
-   the bare domain.
-3. Send Jonny the exact domain and which registrar you bought it from. He will
-   send you two DNS records to add (a 2 minute job in the registrar's
-   dashboard) or, easier, you can add him as a collaborator there.
+1. Decide the name (for example `hobbsmedia.co` or `hobbsmediaco.com`).
+2. Create a free account at https://dash.cloudflare.com/sign-up, then open
+   **Domain Registration → Register Domains**, search the name, and buy it.
+   Cloudflare sells domains at cost with no upsells; expect 10 to 40 dollars a
+   year. Buy it under your own name and email.
+3. Send Jonny the exact domain. He will send you two DNS records to add in the
+   Cloudflare dashboard (a 2 minute job), or you can invite him to the account
+   under **Manage Account → Members** and he will do it.
 
 ## 4. Confirm the facts that go on the site
 
 Jonny will send a short list. Until each one is confirmed the site cannot go
 live. It includes:
 
-- Phone number, email, Instagram handle
+- Email and Instagram handle (Jonny already has your phone number)
 - Where you are based and the area you serve
 - Turnaround time (how fast a client gets their photos and film)
 - Whether "reply same day" is a promise you want to make
 - The names you want for your three services
 - A yes on each of the eight clips currently on the site (they are all yours;
   this is just confirming you are happy with the cuts)
-- Clips 6 and 7 from your numbered list never made it into the download; send
-  them again if you want them in
 
 ## What happens after
 

@@ -25,8 +25,8 @@ export const heroImage: string | null = null;
 
 export const contact = {
   /** E.164 for sms:/tel: links. */
-  phoneE164: todo("contact.phone", "+12065550142"),
-  phoneDisplay: todo("contact.phoneDisplay", "(206) 555-0142"),
+  phoneE164: "+12067904352", // confirmed by Jonny 2026-09-23
+  phoneDisplay: "(206) 790-4352",
   email: todo("contact.email", "hello@hobbsmedia.co"),
   instagram: todo("contact.instagram", "hobbsmedia.co"),
   basedIn: todo("contact.basedIn", "Seattle, WA"),
