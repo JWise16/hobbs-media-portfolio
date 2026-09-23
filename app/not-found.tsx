@@ -1,4 +1,5 @@
 import { NotFound } from "@/components/NotFound";
+import { ThemeShell } from "@/components/ThemeShell";
 
 /**
  * Unknown top-level paths (no theme segment). This file sits in the root
@@ -8,8 +9,8 @@ import { NotFound } from "@/components/NotFound";
  */
 export default function RootNotFound() {
   return (
-    <div data-theme="dark" className="theme-shell">
+    <ThemeShell theme="dark" fontClassName="">
       <NotFound theme="dark" />
-    </div>
+    </ThemeShell>
   );
 }

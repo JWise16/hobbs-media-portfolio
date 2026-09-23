@@ -1,10 +1,11 @@
 import type { NextConfig } from "next";
+import { reviewTheme } from "./content/config";
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   // Reviewers open /<theme>; the bare root goes to the mockup reference theme.
   async redirects() {
-    return [{ source: "/", destination: "/dark", permanent: false }];
+    return [{ source: "/", destination: `/${reviewTheme}`, permanent: false }];
   },
   async headers() {
     return [
@@ -19,6 +20,10 @@ const nextConfig: NextConfig = {
   // function so a request-time render (static generation skipped) still works.
   outputFileTracingIncludes: {
     "/**/opengraph-image": ["./public/clips/*.jpg", "./fonts/files/*.ttf"],
+  },
+  // The dynamic poster read would otherwise trace every mp4 into all twelve OG functions.
+  outputFileTracingExcludes: {
+    "/**/opengraph-image": ["./public/clips/*.mp4", "./fonts/files/*.woff2"],
   },
 };
 

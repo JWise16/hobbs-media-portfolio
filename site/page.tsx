@@ -6,7 +6,7 @@ import { findAgent } from "@/content/agents";
 import { findProperty } from "@/content/properties";
 import { brand } from "@/content/site";
 import type { ThemeId } from "@/content/themes";
-import { agentParams, propertyParams } from "@/site/routes";
+import { agentParams, propertyParams, routeTitle } from "@/site/routes";
 
 /**
  * Factories for the per-theme route files. Each file in app/<theme>/ is a
@@ -18,7 +18,7 @@ const noIndex: Metadata["robots"] = { index: false, follow: false };
 export function makeHomeRoute(theme: ThemeId) {
   const metadata: Metadata = {
     title: { absolute: brand.name },
-    description: "Real estate photo, film and aerial for Seattle and Puget Sound listings.",
+    description: brand.description,
   };
   function Page() {
     return <HomePage theme={theme} />;
@@ -35,7 +35,7 @@ export function makeAgentRoute(theme: ThemeId) {
     const agent = findAgent((await params).agent);
     if (!agent) return {};
     return {
-      title: `For ${agent.displayName}`,
+      title: routeTitle({ kind: "agent", slug: agent.slug }),
       description: `A calling card from ${brand.name}: real estate photo, film and aerial for Seattle listings.`,
       // A "PREPARED FOR JESSICA" page must never be indexed, at any stage.
       robots: noIndex,
@@ -58,7 +58,7 @@ export function makePropertyRoute(theme: ThemeId) {
     const property = findProperty((await params).slug);
     if (!property) return {};
     return {
-      title: property.title,
+      title: routeTitle({ kind: "property", slug: property.slug }),
       description: `${property.title}, filmed by ${brand.name}.`,
       robots: noIndex,
     };

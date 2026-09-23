@@ -66,7 +66,9 @@ test.describe("routes, metadata, caching", () => {
     await expect(plaque).toContainText("PREPARED FOR JESSICA TRAN");
     await expect(plaque).toContainText("WINDERMERE");
     await expect(plaque.locator("a[href^='tel:']")).toHaveCount(1);
-    await expect(page.getByRole("heading", { name: "Jessica Tran · Windermere" })).toBeVisible();
+    await expect(page.getByRole("heading", { level: 2, name: "Jessica Tran · Windermere" })).toBeVisible();
+    // One h1 per page: the wordmark in the hero.
+    expect(await page.locator("h1").count()).toBe(1);
     await expect(page.getByRole("link", { name: /selected work/i })).toHaveAttribute("href", "/dark#work");
     // Property card names the property and the agent.
     await page.goto("/dark/p/ocean-ave");

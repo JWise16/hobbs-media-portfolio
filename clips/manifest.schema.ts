@@ -20,7 +20,8 @@ export const ratioSchema = z.enum(["16:9", "9:16"]);
 /** ffmpeg bitrate strings such as "4M" or "1200k". */
 const bitrateSchema = z.string().regex(/^\d+(\.\d+)?[kKmM]?$/, "bitrate like 4M or 1200k");
 
-export const clipEntrySchema = z
+/** The field shape without cross-field rules; the sidecar schema reuses it. */
+export const clipEntryBaseSchema = z
   .object({
     id: z
       .string()
@@ -44,8 +45,9 @@ export const clipEntrySchema = z
     approved: z.boolean().default(false),
     hero: z.boolean().default(false),
   })
-  .strict()
-  .superRefine((entry, ctx) => {
+  .strict();
+
+export const clipEntrySchema = clipEntryBaseSchema.superRefine((entry, ctx) => {
     if (entry.in >= entry.out) {
       ctx.addIssue({ code: "custom", path: ["out"], message: `out (${entry.out}) must be greater than in (${entry.in})` });
     }

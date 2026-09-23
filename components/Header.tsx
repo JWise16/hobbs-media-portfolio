@@ -11,21 +11,37 @@ import { scrollDim } from "@/lib/scrollDim";
  * progress reaches 1, then fades in over 200ms; wordmark 18px left, one
  * tracked link TEXT SAM right, surface at 92%, 56px, no border, no hamburger.
  * `hobbs`: static from the top over the still hero, sticky at 56px after it.
- * `always` (calling-card beat two, 404): visible from the start.
  */
-export function Header({ theme, mode }: { theme: ThemeId; mode?: "on-progress" | "static-then-sticky" | "always" }) {
+export function Header({ theme, mode }: { theme: ThemeId; mode?: "on-progress" | "static-then-sticky" }) {
   const m = mode ?? themes[theme].header;
   const [visible, setVisible] = useState(m !== "on-progress");
   const [pastHero, setPastHero] = useState(false);
 
   useEffect(() => {
-    if (m === "always") return;
-    const dim = scrollDim();
-    dim.start();
-    return dim.subscribe((s) => {
-      if (m === "on-progress") setVisible(s.progress >= 1);
-      setPastHero(window.scrollY >= window.innerHeight - 56);
-    });
+    if (m === "on-progress") {
+      const dim = scrollDim();
+      dim.start();
+      return dim.subscribe((s) => setVisible(s.progress >= 1));
+    }
+    // static-then-sticky: the dim store stops publishing once progress
+    // saturates at 0.6svh, so the past-hero flip listens to raw scroll.
+    const headerH = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--header-h")) || 56;
+    let raf = 0;
+    const measure = () => {
+      raf = 0;
+      setPastHero(window.scrollY >= window.innerHeight - headerH);
+    };
+    const onScroll = () => {
+      if (!raf) raf = requestAnimationFrame(measure);
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll, { passive: true });
+    measure();
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+      if (raf) cancelAnimationFrame(raf);
+    };
   }, [m]);
 
   return (

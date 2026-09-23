@@ -9,7 +9,6 @@ export type ThemeId = (typeof themeIds)[number];
 
 export interface ThemeConfig {
   id: ThemeId;
-  label: string;
   /** reel = cinematic full-bleed loop with scroll dim; still = Sam's Lovable hero. */
   hero: "reel" | "still";
   support: "satoshi" | "manrope";
@@ -23,7 +22,6 @@ export interface ThemeConfig {
 export const themes: Record<ThemeId, ThemeConfig> = {
   hobbs: {
     id: "hobbs",
-    label: "Hobbs",
     hero: "still",
     support: "manrope",
     kickers: true,
@@ -32,7 +30,6 @@ export const themes: Record<ThemeId, ThemeConfig> = {
   },
   dark: {
     id: "dark",
-    label: "Dark",
     hero: "reel",
     support: "satoshi",
     kickers: false,
@@ -41,7 +38,6 @@ export const themes: Record<ThemeId, ThemeConfig> = {
   },
   light: {
     id: "light",
-    label: "Light",
     hero: "reel",
     support: "satoshi",
     kickers: false,
@@ -50,7 +46,6 @@ export const themes: Record<ThemeId, ThemeConfig> = {
   },
   twilight: {
     id: "twilight",
-    label: "Twilight",
     hero: "reel",
     support: "satoshi",
     kickers: false,
@@ -61,8 +56,4 @@ export const themes: Record<ThemeId, ThemeConfig> = {
 
 export function isThemeId(value: string): value is ThemeId {
   return (themeIds as readonly string[]).includes(value);
-}
-
-export function isCinematic(theme: ThemeId): boolean {
-  return themes[theme].hero === "reel";
 }

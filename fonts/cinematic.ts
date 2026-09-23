@@ -24,7 +24,6 @@ export const support = localFont({
   src: [
     { path: "./files/Satoshi-Regular.woff2", weight: "400", style: "normal" },
     { path: "./files/Satoshi-Medium.woff2", weight: "500", style: "normal" },
-    { path: "./files/Satoshi-Bold.woff2", weight: "700", style: "normal" },
   ],
   variable: "--font-support",
   display: "swap",

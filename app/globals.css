@@ -24,11 +24,12 @@
   html {
     -webkit-text-size-adjust: 100%;
     scrollbar-width: thin;
-    scrollbar-color: color-mix(in srgb, var(--muted, #888) 40%, transparent) transparent;
+    /* scrollbar-color per theme lives in styles/tokens.css (html:has([data-theme])) */
   }
 
   body {
     margin: 0;
+    min-height: 100vh;
     min-height: 100svh;
   }
 
@@ -84,6 +85,16 @@
     display: block;
     max-width: 100%;
   }
+
+  /* iOS paints its own start-playback glyph when muted autoplay is refused; the
+     site's TAP TO PLAY affordance is the only control. */
+  video::-webkit-media-controls-start-playback-button {
+    display: none;
+    -webkit-appearance: none;
+  }
+  video::-webkit-media-controls {
+    display: none;
+  }
 }
 
 @layer components {
@@ -132,6 +143,10 @@
   }
   .display-h2:first-child {
     margin-top: 0;
+  }
+  /* hobbs: the kicker sits tight to its headline; the section carries the space above. */
+  .kicker + .display-h2 {
+    margin-top: 16px;
   }
 
   .body-muted {

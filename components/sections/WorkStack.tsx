@@ -42,7 +42,7 @@ export function WorkStack({ theme }: { theme: ThemeId }) {
             );
           }
           return (
-            <figure key={item.slug} className="frame frame-still" tabIndex={0} aria-label={item.title}>
+            <figure key={item.slug} className="frame frame-still" aria-label={item.title}>
               <div className="frame-box">
                 <Image src={item.media.image} alt={item.media.alt} fill sizes="100vw" className="frame-poster" />
                 <div className="frame-scrim" aria-hidden="true" />

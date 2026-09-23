@@ -23,6 +23,7 @@ test.describe("accessibility contract (16A)", () => {
       expect(await page.locator("header").count(), path).toBe(1);
       expect(await page.locator("main").count(), path).toBe(1);
       expect(await page.locator("footer").count(), path).toBe(1);
+      expect(await page.locator("h1").count(), path).toBe(1);
       const unlabeled = await page.locator("main section:not([aria-labelledby]):not([aria-label])").count();
       expect(unlabeled, path).toBe(0);
     }

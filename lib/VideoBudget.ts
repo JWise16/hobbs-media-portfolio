@@ -39,13 +39,17 @@ interface Entry extends Registration {
   id: string;
   state: BudgetState;
   userPaused: boolean;
+  /** Incremented on every play()/pause() so a stale rejection (AbortError from an interrupting pause) is ignored. */
+  playToken: number;
+  /** The media element reported an error; excluded from play candidates until a tap retries. */
+  errored: boolean;
+  /** The 1080 rung failed and the 720 rung was substituted once. */
+  fellBack: boolean;
   onError: () => void;
 }
 
 export interface VideoBudgetOptions {
   win?: Window;
-  /** Injected in tests. */
-  now?: () => number;
 }
 
 export class VideoBudget {
@@ -101,10 +105,23 @@ export class VideoBudget {
       id: `${reg.kind}-${++this.seq}`,
       state: "detached",
       userPaused: false,
+      playToken: 0,
+      errored: false,
+      fellBack: false,
       onError: () => {
+        // A broken 1080 file falls back to the 720 rung once (the island does the same pre-hydration).
+        if (el.getAttribute("data-rung") === "1080" && !entry.fellBack) {
+          entry.fellBack = true;
+          el.setAttribute("src", reg.src720);
+          el.setAttribute("data-rung", "720");
+          el.load();
+          this.setState(entry, "attached");
+          this.schedule();
+          return;
+        }
         // Clip 404 or decode error after the poster: stay on the poster, log, nothing else changes.
         if (typeof console !== "undefined") console.warn("[VideoBudget] video error", reg.src720);
-        entry.state = "attached";
+        entry.errored = true;
         this.setState(entry, "attached");
       },
     };
@@ -117,7 +134,6 @@ export class VideoBudget {
       // Island init on client navigation (T3): innerHTML-inserted scripts never run.
       if (el.getAttribute("data-hero-init") !== "1") heroInit(el);
       entry.state = this.heroStateFromIsland(el);
-      if (entry.state === "detached") entry.state = "attached";
     }
     this.entries.set(el, entry);
     this.setState(entry, entry.state);
@@ -137,20 +153,22 @@ export class VideoBudget {
   toggle(el: HTMLVideoElement): boolean {
     const entry = this.entries.get(el);
     if (!entry) return false;
-    if (entry.state === "blocked") {
+    if (entry.state === "blocked" || entry.errored) {
       // Blocked: the tap is the user gesture iOS wanted. Try again.
       entry.userPaused = false;
+      entry.errored = false;
       this.play(entry);
       return false;
     }
     entry.userPaused = !entry.userPaused;
     if (entry.userPaused) {
-      if (entry.state === "playing") el.pause();
-      entry.state = "paused";
+      if (entry.state === "playing") {
+        entry.playToken++;
+        el.pause();
+      }
       this.setState(entry, "paused");
     } else {
-      entry.state = entry.el.getAttribute("src") ? "attached" : "detached";
-      this.setState(entry, entry.state);
+      this.setState(entry, entry.el.getAttribute("src") ? "attached" : "detached");
     }
     this.schedule();
     return entry.userPaused;
@@ -169,7 +187,15 @@ export class VideoBudget {
     for (const e of this.entries.values()) {
       const rect = e.rect ? e.rect() : e.el.getBoundingClientRect();
       const m = measure(rect, vh);
-      items.push({ id: e.id, kind: e.kind, distance: m.distance, centerOffset: m.centerOffset, state: e.state, userPaused: e.userPaused });
+      items.push({
+        id: e.id,
+        kind: e.kind,
+        distance: m.distance,
+        centerOffset: m.centerOffset,
+        // An errored element never wins; it keeps its poster until a tap retries.
+        state: e.errored && e.state !== "detached" ? "blocked" : e.state,
+        userPaused: e.userPaused,
+      });
     }
     const actions = decide(items, {
       reducedMotion: !!this.reduced?.matches,
@@ -212,7 +238,9 @@ export class VideoBudget {
     if (e.el.getAttribute("src") !== src) {
       e.el.setAttribute("src", src);
       e.el.setAttribute("data-rung", rung);
-      e.el.setAttribute("preload", "auto");
+      // Metadata only: enough for the first frame; play() bumps to auto. Keeps
+      // attached-but-idle clips from downloading in full on cellular.
+      e.el.setAttribute("preload", "metadata");
       if (e.loop) e.el.setAttribute("loop", "");
       e.el.load();
     }
@@ -220,7 +248,10 @@ export class VideoBudget {
   }
 
   private detach(e: Entry): void {
+    e.playToken++;
     if (e.state === "playing") e.el.pause();
+    e.errored = false;
+    e.fellBack = false;
     e.el.removeAttribute("src");
     e.el.setAttribute("preload", "none");
     e.el.load();
@@ -230,28 +261,37 @@ export class VideoBudget {
   private play(e: Entry): void {
     if (!e.el.getAttribute("src")) this.attach(e);
     e.el.setAttribute("preload", "auto");
+    const token = ++e.playToken;
     let p: Promise<void> | void;
     try {
       p = e.el.play();
-    } catch {
-      p = Promise.reject(new Error("play threw"));
+    } catch (err) {
+      p = Promise.reject(err instanceof Error ? err : new Error("play threw"));
     }
     // Optimistic: the policy treats a pending play() as playing so the next
-    // frame never calls play() twice; a rejection flips it to blocked.
+    // frame never calls play() twice. Only a rejection for THIS attempt counts:
+    // a pause() that interrupts a pending play() rejects the old promise with
+    // AbortError, and that must not mark the clip blocked.
     this.setState(e, "playing");
     if (p && typeof (p as Promise<void>).then === "function") {
       (p as Promise<void>).then(
         () => {
-          if (this.entries.get(e.el) === e && e.userPaused) this.setState(e, "paused");
+          if (this.entries.get(e.el) === e && e.playToken === token && e.userPaused) this.setState(e, "paused");
         },
-        () => {
-          if (this.entries.get(e.el) === e && e.state === "playing") this.setState(e, "blocked");
+        (err: unknown) => {
+          if (this.entries.get(e.el) !== e || e.playToken !== token || e.state !== "playing") return;
+          const name = (err as { name?: string } | null)?.name;
+          // A fresh AbortError means our own load() interrupted this attempt: harmless,
+          // the next frame retries. Anything else (NotAllowedError in Low Power Mode,
+          // a synchronous throw) needs a tap, so it is blocked and never retried in a loop.
+          this.setState(e, name === "AbortError" ? "attached" : "blocked");
         },
       );
     }
   }
 
   private pause(e: Entry): void {
+    e.playToken++;
     e.el.pause();
     this.setState(e, e.userPaused ? "paused" : "attached");
   }

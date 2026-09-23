@@ -1,3 +1,4 @@
+import { ContactActions, ContactLines } from "@/components/ContactActions";
 import { contact, contactLinks, copy } from "@/content/site";
 import { themes, type ThemeId } from "@/content/themes";
 
@@ -9,11 +10,12 @@ import { themes, type ThemeId } from "@/content/themes";
  */
 export function Contact({ theme }: { theme: ThemeId }) {
   const t = themes[theme];
+  const labels = copy.contact.facts;
   const facts: Array<{ label: string; value: React.ReactNode }> = [
-    { label: "Based in", value: contact.basedIn },
-    { label: "Serving", value: contact.serving },
+    { label: labels.basedIn, value: contact.basedIn },
+    { label: labels.serving, value: contact.serving },
     {
-      label: "Instagram",
+      label: labels.instagram,
       value: (
         <a href={contactLinks.instagram()} className="tap fact-link" rel="noopener">
           @{contact.instagram}
@@ -21,7 +23,7 @@ export function Contact({ theme }: { theme: ThemeId }) {
       ),
     },
   ];
-  if (contact.hours) facts.push({ label: "Hours", value: contact.hours });
+  if (contact.hours) facts.push({ label: labels.hours, value: contact.hours });
 
   return (
     <section id="contact" className="section contact" aria-labelledby="contact-heading">
@@ -34,20 +36,8 @@ export function Contact({ theme }: { theme: ThemeId }) {
           <p className="measure contact-sentence">{copy.contact.sentence}</p>
         </div>
         <div className="contact-actions">
-          <div className="contact-buttons">
-            <a className="btn btn-primary" href={contactLinks.sms()} data-event="text-sam">
-              {copy.contact.textSam}
-            </a>
-            <a className="btn btn-secondary" href={contactLinks.mailto()} data-event="email-sam">
-              {copy.contact.emailSam}
-            </a>
-          </div>
-          <p className="contact-lines">
-            <a href={contactLinks.tel()} className="tap tabular contact-phone">
-              {contact.phoneDisplay}
-            </a>
-            <span className="contact-email">{contact.email}</span>
-          </p>
+          <ContactActions variant="section" />
+          <ContactLines variant="section" />
           <dl className="facts">
             {facts.map((f) => (
               <div key={f.label} className="fact">

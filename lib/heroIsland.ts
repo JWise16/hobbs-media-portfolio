@@ -50,6 +50,7 @@ export function renderHeroIsland(o: HeroIslandOptions): string {
     `id="${escapeAttr(heroVideoId(o.id))}"`,
     `class="hero-video"`,
     `src="${escapeAttr(o.src720)}"`,
+    `data-src-720="${escapeAttr(o.src720)}"`,
     o.src1080 ? `data-src-1080="${escapeAttr(o.src1080)}"` : "",
     `poster="${escapeAttr(o.poster)}"`,
     `preload="metadata"`,

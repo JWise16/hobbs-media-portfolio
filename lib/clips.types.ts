@@ -41,5 +41,3 @@ export interface ClipEntry {
   hero: boolean;
   files: ClipFiles;
 }
-
-export type ClipIndex = Record<string, ClipEntry>;

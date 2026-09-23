@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ContactActions, ContactLines } from "@/components/ContactActions";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { Hero } from "@/components/hero/Hero";
@@ -6,7 +7,7 @@ import { Wordmark } from "@/components/Wordmark";
 import type { Agent } from "@/content/agents";
 import { clips } from "@/content/clips.generated";
 import type { Property } from "@/content/properties";
-import { brand, contact, contactLinks, copy, heroClip } from "@/content/site";
+import { brand, contact, copy, heroClip } from "@/content/site";
 import type { ThemeId } from "@/content/themes";
 import { workHref } from "@/lib/href";
 import { agentPlaque, nameLine, propertyPlaque } from "@/lib/plaque";
@@ -42,27 +43,12 @@ export function CallingCard({ theme, agent, property }: CallingCardProps) {
           <div className="beat-two-inner">
             <Wordmark theme={theme} size="card" />
             <p className="tracked kicker beat-two-kicker">{copy.preparedFor}</p>
-            <h1 id="card-heading" className="beat-two-name">
+            <h2 id="card-heading" className="beat-two-name">
               {name}
-            </h1>
+            </h2>
             {property?.address ? <p className="beat-two-address">{property.address}</p> : null}
-            <div className="beat-two-buttons">
-              <a className="btn btn-primary" href={contactLinks.sms()} data-event="text-sam">
-                {copy.contact.textSam}
-              </a>
-              <a className="btn btn-secondary" href={contactLinks.mailto()} data-event="email-sam">
-                {copy.contact.emailSam}
-              </a>
-            </div>
-            <p className="beat-two-details body-muted">
-              <a href={contactLinks.tel()} className="tap tabular">
-                {contact.phoneDisplay}
-              </a>
-              <span>{contact.email}</span>
-              <a href={contactLinks.instagram()} className="tap" rel="noopener">
-                @{contact.instagram}
-              </a>
-            </p>
+            <ContactActions variant="card" />
+            <ContactLines variant="card" />
             <Link href={workHref(theme)} className="tracked tap beat-two-work">
               {copy.selectedWork} →
             </Link>

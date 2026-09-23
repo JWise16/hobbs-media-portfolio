@@ -14,6 +14,17 @@ export interface Fixtures {
 }
 
 let cached: Fixtures | null = null;
+const created: string[] = [];
+
+process.on("exit", () => {
+  for (const dir of created) {
+    try {
+      fs.rmSync(dir, { recursive: true, force: true });
+    } catch {
+      /* best effort */
+    }
+  }
+});
 
 export function makeFixtureClip(file: string, width: number, height: number, seconds = 2, fps = 30): void {
   const r = spawnSync(
@@ -44,6 +55,7 @@ export function makeFixtureClip(file: string, width: number, height: number, sec
 export function fixtures(): Fixtures {
   if (cached) return cached;
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), "hobbs-fixtures-"));
+  created.push(dir);
   const landscape = path.join(dir, "landscape.mp4");
   const portrait = path.join(dir, "portrait.mp4");
   makeFixtureClip(landscape, 1280, 720);
@@ -53,5 +65,7 @@ export function fixtures(): Fixtures {
 }
 
 export function tmpWorkspace(): string {
-  return fs.mkdtempSync(path.join(os.tmpdir(), "hobbs-encode-"));
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "hobbs-encode-"));
+  created.push(dir);
+  return dir;
 }

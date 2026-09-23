@@ -12,7 +12,11 @@
   /* Scrims that keep text legible over footage (1A). */
   --scrim-radial: radial-gradient(ellipse 60% 50% at 50% 50%, rgb(0 0 0 / 0.35), transparent);
   --scrim-bottom: linear-gradient(to top, rgb(0 0 0 / 0.55), rgb(0 0 0 / 0) 45%);
+  /* Desktop: the radial sits over the calm region the manifest focal marks (1A). */
+  --scrim-radial-desktop: radial-gradient(ellipse 45% 50% at var(--focal-x, 50%) 50%, rgb(0 0 0 / 0.35), transparent);
   --scrim-stack: linear-gradient(to top, rgb(0 0 0 / 0.6), transparent 45%);
+  /* hobbs still hero: darker foot for the headline and CTAs, light lift at the top for the header. */
+  --scrim-hobbs-hero: linear-gradient(to top, rgb(0 0 0 / 0.6), rgb(0 0 0 / 0.15) 60%, rgb(0 0 0 / 0.3));
   /* Text and chip colors that sit directly on footage or posters. */
   --on-footage: #f3efe6;
   --on-footage-muted: rgb(243 239 230 / 0.6);
@@ -28,11 +32,10 @@
   --h2-above: 64px;
   --h2-below: 24px;
   --touch-min: 44px;
-  --dim-travel: 0.6; /* of 1svh */
+  /* The dim travels over 0.6svh (DIM_TRAVEL in lib/scrollDim.ts) and eases out cubic there. */
   --dim-max: 0.86;
   --mark-lift: -24px;
   --header-fade: 200ms;
-  --ease-out-cubic: cubic-bezier(0.215, 0.61, 0.355, 1);
 }
 
 @media (min-width: 1024px) {
@@ -124,20 +127,73 @@
   --contact-button-text: #111214;
 }
 
-/* The page background must match the theme surface (overscroll, pre-paint). */
+/*
+ * The page background and scrollbar must match the theme surface (overscroll,
+ * pre-paint). `--muted` is scoped to [data-theme], so the html-level scrollbar
+ * color is spelled out per theme here (thumb = muted at 40%).
+ */
 html:has([data-theme="dark"]) {
   background: #0b0d12;
   color-scheme: dark;
+  scrollbar-color: rgb(140 155 176 / 0.4) transparent;
 }
 html:has([data-theme="light"]) {
   background: #f5f1ea;
   color-scheme: light;
+  scrollbar-color: rgb(122 115 107 / 0.4) transparent;
 }
 html:has([data-theme="twilight"]) {
   background: #12100e;
   color-scheme: dark;
+  scrollbar-color: rgb(168 152 128 / 0.4) transparent;
 }
 html:has([data-theme="hobbs"]) {
   background: #f7f4ee;
   color-scheme: light;
+  scrollbar-color: rgb(126 140 160 / 0.4) transparent;
+}
+
+/*
+ * prefers-color-scheme pairs dark and light only (16A), and only once a theme
+ * is chosen (`data-pair` is set by ThemeShell when launchTheme is set). The
+ * values repeat the two theme blocks above on purpose: CSS cannot alias one
+ * block to another, and the pairing must never leak into the review links.
+ */
+@media (prefers-color-scheme: light) {
+  [data-theme="dark"][data-pair] {
+    color-scheme: light;
+    --surface: #f5f1ea;
+    --text: #2a2621;
+    --muted: #7a736b;
+    --hairline: rgb(42 38 33 / 0.12);
+    --button-fill: #2a2621;
+    --button-text: #f5f1ea;
+    --hero-text: #f3efe6;
+    --overlay-tint: rgb(245 241 234 / 0.1);
+    --dim-target: #f5f1ea;
+  }
+  html:has([data-theme="dark"][data-pair]) {
+    background: #f5f1ea;
+    color-scheme: light;
+    scrollbar-color: rgb(122 115 107 / 0.4) transparent;
+  }
+}
+@media (prefers-color-scheme: dark) {
+  [data-theme="light"][data-pair] {
+    color-scheme: dark;
+    --surface: #0b0d12;
+    --text: #f3efe6;
+    --muted: #8c9bb0;
+    --hairline: rgb(255 255 255 / 0.12);
+    --button-fill: #f3efe6;
+    --button-text: #0b0d12;
+    --hero-text: #f3efe6;
+    --overlay-tint: rgb(20 30 50 / 0.25);
+    --dim-target: #0b0d12;
+  }
+  html:has([data-theme="light"][data-pair]) {
+    background: #0b0d12;
+    color-scheme: dark;
+    scrollbar-color: rgb(140 155 176 / 0.4) transparent;
+  }
 }

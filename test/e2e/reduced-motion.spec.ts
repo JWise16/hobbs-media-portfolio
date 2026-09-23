@@ -26,7 +26,7 @@ test.describe("prefers-reduced-motion: posters only, normal flow", () => {
     await page.goto("/dark/for/jessica", { waitUntil: "networkidle" });
     await expect(page.locator(".hero-video")).toHaveAttribute("data-hero-state", "reduced");
     await scrollToFraction(page, 1);
-    await expect(page.getByRole("heading", { name: /jessica tran/i })).toBeVisible();
+    await expect(page.getByRole("heading", { level: 2, name: /jessica tran/i })).toBeVisible();
     await expect(page.locator(".hero-text")).toHaveCSS("opacity", "1");
   });
 });

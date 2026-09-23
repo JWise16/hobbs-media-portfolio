@@ -8,30 +8,38 @@
  *
  * Runs as `prebuild`, so `next build` on Vercel cannot skip it.
  */
-import { pathToFileURL } from "node:url";
-import path from "node:path";
-import { resolveStage, StageError, type SiteStage } from "../lib/stage";
+import type { TodoEntry } from "../content/todo";
+import type { LimitViolation } from "../lib/plaque";
+import { resolveStage, StageError, type SiteStage, type StageEnv } from "../lib/stage";
+import { loadDotEnv } from "./env";
+import { isMain } from "./isMain";
 
 export interface GuardReport {
   stage: SiteStage;
-  todos: Array<{ label: string; value: string }>;
+  todos: TodoEntry[];
   unapprovedClips: string[];
-  limitViolations: Array<{ what: string; value: string; length: number; limit: number }>;
-  plaqueLimitViolations: Array<{ what: string; value: string; length: number; limit: number }>;
+  limitViolations: LimitViolation[];
+  plaqueLimitViolations: LimitViolation[];
+  /** Content problems that fail at every stage: dangling references, bad slugs, a stale generated index. */
+  integrity: string[];
+  /** Live-only requirements (SITE_URL). */
+  launch: string[];
   ok: boolean;
   lines: string[];
 }
 
-export type GuardEnv = Record<string, string | undefined>;
+export type GuardEnv = StageEnv;
+
+const SLUG_RE = /^[a-z0-9][a-z0-9-]*$/;
 
 /**
- * Loads content modules fresh so todo() registrations reflect the files on
- * disk, then evaluates every rule. Exported for tests.
+ * Evaluates every rule against the content modules (imported once per
+ * process; tests that need different content mock the modules). Exported for tests.
  */
 export async function runGuard(env: GuardEnv = process.env): Promise<GuardReport> {
   const stage = resolveStage(env);
 
-  const [{ todos }, site, { agents }, { properties }, { work }, { clips }, plaque] = await Promise.all([
+  const [{ todos }, site, { agents }, { properties }, { work }, { clips }, plaque, manifestModule] = await Promise.all([
     import("../content/todo"),
     import("../content/site"),
     import("../content/agents"),
@@ -39,12 +47,44 @@ export async function runGuard(env: GuardEnv = process.env): Promise<GuardReport
     import("../content/work"),
     import("../content/clips.generated"),
     import("../lib/plaque"),
+    import("../clips/manifest.json"),
   ]);
+  const index = clips as Record<string, { approved: boolean }>;
+  const manifest = (manifestModule as { default?: { clips: Array<{ id: string; approved?: boolean }> } }).default ?? (manifestModule as { clips: Array<{ id: string; approved?: boolean }> });
 
   const referenced = new Set<string>([site.heroClip]);
   for (const w of work) if ("clip" in w.media) referenced.add(w.media.clip);
   for (const p of properties) if (p.reel) referenced.add(p.reel);
-  const unapprovedClips = [...referenced].filter((id) => !(clips as Record<string, { approved: boolean }>)[id]?.approved);
+  const unapprovedClips = [...referenced].filter((id) => !index[id]?.approved);
+
+  const integrity: string[] = [];
+  // The generated index is what the site reads; if it disagrees with the
+  // manifest, `npm run encode` was skipped after an edit.
+  const manifestIds = new Set(manifest.clips.map((c) => c.id));
+  for (const id of Object.keys(index)) if (!manifestIds.has(id)) integrity.push(`clips.generated.ts has "${id}" but clips/manifest.json does not: run npm run encode`);
+  for (const c of manifest.clips) {
+    if (!index[c.id]) integrity.push(`clips/manifest.json has "${c.id}" but clips.generated.ts does not: run npm run encode`);
+    else if (Boolean(c.approved) !== index[c.id].approved) integrity.push(`"${c.id}" approved=${Boolean(c.approved)} in the manifest but ${index[c.id].approved} in the index: run npm run encode`);
+  }
+  for (const id of referenced) if (!index[id]) integrity.push(`referenced clip "${id}" is not in clips.generated.ts`);
+  const agentSlugs = new Set(agents.map((a) => a.slug));
+  for (const a of agents) if (!SLUG_RE.test(a.slug)) integrity.push(`agents[${a.slug}]: slug must be lowercase kebab-case`);
+  for (const p of properties) {
+    if (!SLUG_RE.test(p.slug)) integrity.push(`properties[${p.slug}]: slug must be lowercase kebab-case`);
+    if (p.agent && !agentSlugs.has(p.agent)) integrity.push(`properties[${p.slug}].agent "${p.agent}" does not match any agent slug`);
+  }
+
+  const launch: string[] = [];
+  if (stage === "live") {
+    const url = env.SITE_URL;
+    let parsed = false;
+    try {
+      parsed = !!url && new URL(url).protocol.startsWith("http");
+    } catch {
+      parsed = false;
+    }
+    if (!parsed) launch.push(`SITE_URL must be an absolute https URL at SITE_STAGE=live (got ${url === undefined ? "nothing" : JSON.stringify(url)}); og:image links depend on it`);
+  }
 
   const limitViolations = [...agents.flatMap(plaque.checkAgentLimits), ...properties.flatMap(plaque.checkPropertyLimits)];
 
@@ -76,6 +116,17 @@ export async function runGuard(env: GuardEnv = process.env): Promise<GuardReport
     }
   }
 
+  if (integrity.length) {
+    lines.push("");
+    lines.push("Content integrity:");
+    for (const m of integrity) lines.push(`  ${m}`);
+  }
+  if (launch.length) {
+    lines.push("");
+    lines.push("Launch requirements:");
+    for (const m of launch) lines.push(`  ${m}`);
+  }
+
   lines.push("");
   if (todoList.length) {
     lines.push(`Unconfirmed facts (${todoList.length}):`);
@@ -93,26 +144,21 @@ export async function runGuard(env: GuardEnv = process.env): Promise<GuardReport
   }
 
   const limitsOk = limitViolations.length === 0 && plaqueLimitViolations.length === 0;
-  const liveOk = stage === "review" || (todoList.length === 0 && unapprovedClips.length === 0);
-  const ok = limitsOk && liveOk;
+  const integrityOk = integrity.length === 0;
+  const liveOk = stage === "review" || (todoList.length === 0 && unapprovedClips.length === 0 && launch.length === 0);
+  const ok = limitsOk && integrityOk && liveOk;
 
   lines.push("");
   if (!limitsOk) lines.push("FAIL: shorten the strings above.");
-  if (!liveOk) lines.push("FAIL: SITE_STAGE=live refuses to ship while any unconfirmed fact or unapproved clip remains.");
+  if (!integrityOk) lines.push("FAIL: fix the content integrity problems above.");
+  if (!liveOk) lines.push("FAIL: SITE_STAGE=live refuses to ship while any unconfirmed fact, unapproved clip, or launch requirement remains.");
   if (ok) lines.push(stage === "live" ? "OK: nothing unconfirmed, every referenced clip approved." : "OK for review: placeholders are allowed.");
 
-  return { stage, todos: todoList, unapprovedClips, limitViolations, plaqueLimitViolations, ok, lines };
+  return { stage, todos: todoList, unapprovedClips, limitViolations, plaqueLimitViolations, integrity, launch, ok, lines };
 }
 
-const isMain = (() => {
-  try {
-    return process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href;
-  } catch {
-    return false;
-  }
-})();
-
-if (isMain) {
+if (isMain(import.meta.url)) {
+  loadDotEnv();
   runGuard()
     .then((r) => {
       console.log(r.lines.join("\n"));

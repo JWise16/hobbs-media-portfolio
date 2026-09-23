@@ -12,8 +12,6 @@
 export const DESKTOP_QUERY = "(min-width: 1024px)";
 export const REDUCED_MOTION_QUERY = "(prefers-reduced-motion: reduce)";
 
-export type HeroState = "idle" | "reduced" | "starting" | "playing" | "blocked" | "error";
-
 /* eslint-disable no-var */
 export function heroInit(v: HTMLVideoElement): void {
   if (!v || v.getAttribute("data-hero-init") === "1") return;
@@ -27,14 +25,30 @@ export function heroInit(v: HTMLVideoElement): void {
     v.setAttribute("src", hi);
     v.setAttribute("data-rung", "1080");
   }
+  var started = false;
   v.addEventListener("error", function () {
+    // A broken 1080 file falls back to the 720 rung once; a second failure stays on the poster.
+    var lo = v.getAttribute("data-src-720");
+    if (lo && v.getAttribute("data-rung") === "1080") {
+      v.setAttribute("data-rung", "720");
+      v.setAttribute("src", lo);
+      v.load();
+      if (started) {
+        try {
+          var q = v.play();
+          if (q && typeof q.then === "function") q.then(null, function () {});
+        } catch (_e) {
+          /* poster stays */
+        }
+      }
+      return;
+    }
     v.setAttribute("data-hero-state", "error");
   });
   if (mm && mm.call(win, "(prefers-reduced-motion: reduce)").matches) {
     v.setAttribute("data-hero-state", "reduced");
     return;
   }
-  var started = false;
   var start = function () {
     if (started) return;
     started = true;

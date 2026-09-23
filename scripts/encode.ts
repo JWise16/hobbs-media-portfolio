@@ -19,9 +19,12 @@ import { createHash } from "node:crypto";
 import { createReadStream } from "node:fs";
 import fs from "node:fs/promises";
 import path from "node:path";
-import { pathToFileURL } from "node:url";
-import { manifestSchema, type Manifest, type ManifestEntry } from "../clips/manifest.schema";
+import { parseArgs as nodeParseArgs } from "node:util";
+import { z } from "zod";
+import { clipEntryBaseSchema, manifestSchema, type Manifest, type ManifestEntry } from "../clips/manifest.schema";
 import type { ClipEntry, ClipFiles } from "../lib/clips.types";
+import { loadDotEnv } from "./env";
+import { isMain } from "./isMain";
 
 // ── Errors ────────────────────────────────────────────────────────────────────
 
@@ -35,6 +38,7 @@ export type EncodeErrorCode =
   | "RATIO_MISMATCH"
   | "LOOP_TOO_SHORT"
   | "UNAPPROVED_LIVE"
+  | "LOCKED"
   | "ENCODE_FAILED";
 
 export class EncodeError extends Error {
@@ -66,6 +70,8 @@ export const VERTICAL_RUNG = { width: 720, height: 1280, crf: 25, maxrate: "1.2M
 export interface EncodeOptions {
   manifestPath?: string;
   outDir?: string;
+  /** Sidecars record the source path and hash; they live outside public/ so they are never served. */
+  sidecarDir?: string;
   previewDir?: string;
   indexPath?: string;
   sourceDir?: string;
@@ -96,6 +102,7 @@ function resolveOptions(opts: EncodeOptions): ResolvedOptions {
   return {
     manifestPath: opts.manifestPath ?? path.join(cwd, "clips/manifest.json"),
     outDir: opts.outDir ?? path.join(cwd, "public/clips"),
+    sidecarDir: opts.sidecarDir ?? path.join(cwd, "clips/sidecars"),
     previewDir: opts.previewDir ?? path.join(cwd, "clips/preview"),
     indexPath: opts.indexPath ?? path.join(cwd, "content/clips.generated.ts"),
     sourceDir: opts.sourceDir ?? process.env.CLIPS_SOURCE_DIR ?? path.join(cwd, "clips/source"),
@@ -293,6 +300,8 @@ export function outputNames(id: string, hash: string, ratio: ManifestEntry["rati
 /** Matches `<id>.<hash8>.<rest>` output files in public/clips. */
 export const OUTPUT_FILE_RE = /^([a-z0-9][a-z0-9-]*)\.([0-9a-f]{8})\.(.+)$/;
 
+const FFMPEG_BASE = ["-y", "-hide_banner", "-loglevel", "error", "-nostdin"];
+
 // ── Filter graph ──────────────────────────────────────────────────────────────
 
 export interface GraphPlan {
@@ -426,25 +435,49 @@ export function encoderArgs(o: GraphPlan["outputs"][number], preset: string): st
 
 // ── Sidecar ───────────────────────────────────────────────────────────────────
 
-export interface Sidecar {
-  id: string;
-  hash: string;
-  sourceHash: string;
-  encoderVersion: string;
-  preset: string;
-  entry: Omit<ManifestEntry, "approved">;
-  duration: number;
-  files: ClipFiles;
-  preview?: string;
-  encodedAt: string;
-}
+const sidecarSchema = z
+  .object({
+    id: z.string(),
+    hash: z.string().regex(/^[0-9a-f]{8}$/),
+    sourceHash: z.string(),
+    encoderVersion: z.string(),
+    preset: z.string(),
+    entry: clipEntryBaseSchema.omit({ approved: true }),
+    duration: z.number().positive(),
+    files: z.object({
+      mp4_720: z.string(),
+      mp4_1080: z.string().optional(),
+      poster: z.string(),
+      poster_1920: z.string().optional(),
+    }),
+    preview: z.string().optional(),
+    encodedAt: z.string(),
+  })
+  .strict();
 
-async function readSidecar(file: string): Promise<Sidecar | null> {
+export type Sidecar = z.infer<typeof sidecarSchema>;
+
+/** A sidecar is trusted only if it parses AND names exactly the outputs its id and hash imply. */
+async function readSidecar(file: string, id: string, hash: string, ratio: ManifestEntry["ratio"]): Promise<Sidecar | null> {
+  let json: unknown;
   try {
-    return JSON.parse(await fs.readFile(file, "utf8")) as Sidecar;
+    json = JSON.parse(await fs.readFile(file, "utf8"));
   } catch {
     return null;
   }
+  const parsed = sidecarSchema.safeParse(json);
+  if (!parsed.success) return null;
+  const s = parsed.data;
+  if (s.id !== id || s.hash !== hash) return null;
+  const names = outputNames(id, hash, ratio);
+  const expected: ClipFiles = {
+    mp4_720: `/clips/${names.mp4_720}`,
+    poster: `/clips/${names.poster}`,
+    ...(names.mp4_1080 ? { mp4_1080: `/clips/${names.mp4_1080}` } : {}),
+    ...(names.poster_1920 ? { poster_1920: `/clips/${names.poster_1920}` } : {}),
+  };
+  if (stableStringify(s.files) !== stableStringify(expected)) return null;
+  return s;
 }
 
 async function exists(file: string): Promise<boolean> {
@@ -522,13 +555,13 @@ interface EncodeContext extends ResolvedOptions {
   tmpDir: string;
 }
 
-async function encodeOne(ctx: EncodeContext, entry: ManifestEntry, source: string, p: ProbeResult, hash: string): Promise<Sidecar> {
+async function encodeOne(ctx: EncodeContext, entry: ManifestEntry, source: string, sourceHash: string, p: ProbeResult, hash: string): Promise<Sidecar> {
   const names = outputNames(entry.id, hash, entry.ratio);
   const plan = buildGraph(entry, p);
 
   const tmpFor = (name: string) => path.join(ctx.tmpDir, name);
 
-  const args = ["-y", "-hide_banner", "-loglevel", "error", "-nostdin", ...plan.inputArgs, "-i", source, "-filter_complex", plan.filterComplex];
+  const args = [...FFMPEG_BASE, ...plan.inputArgs, "-i", source, "-filter_complex", plan.filterComplex];
   for (const o of plan.outputs) {
     const name = o.rung === "1080" ? names.mp4_1080! : names.mp4_720;
     args.push(...encoderArgs(o, ctx.preset), tmpFor(name));
@@ -540,11 +573,7 @@ async function encodeOne(ctx: EncodeContext, entry: ManifestEntry, source: strin
 
   // Posters from frame 0 of the encoded outputs, so they match the loop's first frame exactly.
   const posterArgs = (input: string, out: string, width: number | null, q: number) => [
-    "-y",
-    "-hide_banner",
-    "-loglevel",
-    "error",
-    "-nostdin",
+    ...FFMPEG_BASE,
     "-i",
     input,
     "-frames:v",
@@ -565,18 +594,15 @@ async function encodeOne(ctx: EncodeContext, entry: ManifestEntry, source: strin
 
     // Review-only 9:16 preview: the exact cover crop a phone hero shows for this focal.
     const focal = entry.focal ?? { x: 0.5, y: 0.5 };
-    const cropW = 608; // 1080 * 9 / 16 rounded to even
-    const x = Math.round(focal.x * (1920 - cropW));
+    const { width: W, height: H } = RUNGS["1080"];
+    const cropW = Math.round((H * 9) / 16 / 2) * 2; // even width for the JPEG encoder
+    const x = Math.round(focal.x * (W - cropW));
     const rpv = ctx.exec("ffmpeg", [
-      "-y",
-      "-hide_banner",
-      "-loglevel",
-      "error",
-      "-nostdin",
+      ...FFMPEG_BASE,
       "-i",
       tmpFor(names.poster_1920),
       "-vf",
-      `crop=${cropW}:1080:${x}:0`,
+      `crop=${cropW}:${H}:${x}:0`,
       "-q:v",
       "3",
       tmpFor(names.preview_916),
@@ -598,7 +624,7 @@ async function encodeOne(ctx: EncodeContext, entry: ManifestEntry, source: strin
   const sidecar: Sidecar = {
     id: entry.id,
     hash,
-    sourceHash: "",
+    sourceHash,
     encoderVersion: ENCODER_VERSION,
     preset: ctx.preset,
     entry: content,
@@ -665,7 +691,7 @@ export async function encode(opts: EncodeOptions = {}): Promise<EncodeSummary> {
   }
 
   // Validate everything before touching the disk.
-  const plans: Array<{ entry: ManifestEntry; source: string; probe: ProbeResult; hash: string }> = [];
+  const plans: Array<{ entry: ManifestEntry; source: string; sourceHash: string; probe: ProbeResult; hash: string }> = [];
   for (const entry of manifest.clips) {
     const source = resolveSource(entry, o.sourceDir);
     if (!(await exists(source))) {
@@ -675,7 +701,7 @@ export async function encode(opts: EncodeOptions = {}): Promise<EncodeSummary> {
     validateAgainstProbe(entry, p);
     const sourceHash = await hashFile(source);
     const hash = contentHash(sourceHash, entry, o.preset);
-    plans.push({ entry, source, probe: p, hash });
+    plans.push({ entry, source, sourceHash, probe: p, hash });
   }
 
   const summary: EncodeSummary = { encoded: [], skipped: [], pruned: [], index: {} };
@@ -689,7 +715,18 @@ export async function encode(opts: EncodeOptions = {}): Promise<EncodeSummary> {
   }
 
   await fs.mkdir(o.outDir, { recursive: true });
-  const tmpDir = path.join(o.outDir, ".tmp");
+  await fs.mkdir(o.sidecarDir, { recursive: true });
+
+  // One encode at a time per output directory: a second run would otherwise
+  // delete the first run's in-flight temp files.
+  const lockPath = path.join(o.outDir, ".encode.lock");
+  try {
+    await fs.writeFile(lockPath, `${process.pid}\n`, { flag: "wx" });
+  } catch {
+    throw new EncodeError("LOCKED", `another encode is running (or crashed) in ${o.outDir}; remove ${lockPath} if no ffmpeg is alive`);
+  }
+
+  const tmpDir = path.join(o.outDir, `.tmp-${process.pid}`);
   await fs.rm(tmpDir, { recursive: true, force: true });
   await fs.mkdir(tmpDir, { recursive: true });
   const ctx: EncodeContext = { ...o, tmpDir };
@@ -700,16 +737,14 @@ export async function encode(opts: EncodeOptions = {}): Promise<EncodeSummary> {
   try {
     for (const pl of plans) {
       const names = outputNames(pl.entry.id, pl.hash, pl.entry.ratio);
-      const sidecarPath = path.join(o.outDir, names.sidecar);
-      let sidecar: Sidecar | null = o.force ? null : await readSidecar(sidecarPath);
+      const sidecarPath = path.join(o.sidecarDir, names.sidecar);
+      let sidecar: Sidecar | null = o.force ? null : await readSidecar(sidecarPath, pl.entry.id, pl.hash, pl.entry.ratio);
 
-      if (sidecar && sidecar.hash === pl.hash) {
+      if (sidecar) {
         const allPresent = (
           await Promise.all(Object.values(sidecar.files).map((url) => exists(path.join(o.outDir, path.basename(url)))))
         ).every(Boolean);
         if (!allPresent) sidecar = null;
-      } else {
-        sidecar = null;
       }
 
       if (sidecar) {
@@ -717,8 +752,7 @@ export async function encode(opts: EncodeOptions = {}): Promise<EncodeSummary> {
         log(`= ${pl.entry.id} unchanged (${pl.hash})`);
       } else {
         log(`> ${pl.entry.id} encoding (${pl.hash}, ${pl.entry.loop}, ${pl.entry.ratio})`);
-        sidecar = await encodeOne(ctx, pl.entry, pl.source, pl.probe, pl.hash);
-        sidecar.sourceHash = await hashFile(pl.source);
+        sidecar = await encodeOne(ctx, pl.entry, pl.source, pl.sourceHash, pl.probe, pl.hash);
         await writeFileAtomic(sidecarPath, JSON.stringify(sidecar, null, 2) + "\n");
         summary.encoded.push(pl.entry.id);
       }
@@ -738,9 +772,11 @@ export async function encode(opts: EncodeOptions = {}): Promise<EncodeSummary> {
     }
   } finally {
     await fs.rm(tmpDir, { recursive: true, force: true });
+    await fs.rm(lockPath, { force: true });
   }
 
   summary.pruned.push(...(await pruneDir(o.outDir, keep)));
+  summary.pruned.push(...(await pruneDir(o.sidecarDir, keep)));
   summary.pruned.push(...(await pruneDir(o.previewDir, keep)));
   for (const name of summary.pruned) log(`- pruned ${name}`);
 
@@ -756,33 +792,37 @@ export async function encode(opts: EncodeOptions = {}): Promise<EncodeSummary> {
 
 // ── CLI ───────────────────────────────────────────────────────────────────────
 
-function parseArgs(argv: string[]): EncodeOptions {
+export function parseArgs(argv: string[]): EncodeOptions {
+  const { values } = nodeParseArgs({
+    args: argv,
+    options: {
+      force: { type: "boolean" },
+      "dry-run": { type: "boolean" },
+      manifest: { type: "string" },
+      out: { type: "string" },
+      preset: { type: "string" },
+    },
+    strict: true,
+  });
   const opts: EncodeOptions = {};
-  for (let i = 0; i < argv.length; i++) {
-    const a = argv[i];
-    if (a === "--force") opts.force = true;
-    else if (a === "--dry-run") opts.dryRun = true;
-    else if (a === "--manifest") opts.manifestPath = path.resolve(argv[++i]);
-    else if (a === "--out") opts.outDir = path.resolve(argv[++i]);
-    else if (a === "--preset") opts.preset = argv[++i];
-    else {
-      console.error(`unknown argument: ${a}`);
-      process.exit(2);
-    }
-  }
+  if (values.force) opts.force = true;
+  if (values["dry-run"]) opts.dryRun = true;
+  if (values.manifest) opts.manifestPath = path.resolve(values.manifest);
+  if (values.out) opts.outDir = path.resolve(values.out);
+  if (values.preset) opts.preset = values.preset;
   return opts;
 }
 
-const isMain = (() => {
+if (isMain(import.meta.url)) {
+  loadDotEnv();
+  let cliOpts: EncodeOptions;
   try {
-    return process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href;
-  } catch {
-    return false;
+    cliOpts = parseArgs(process.argv.slice(2));
+  } catch (err) {
+    console.error(`usage: npm run encode -- [--force] [--dry-run] [--manifest <file>] [--out <dir>] [--preset <x264 preset>]\n${(err as Error).message}`);
+    process.exit(2);
   }
-})();
-
-if (isMain) {
-  encode(parseArgs(process.argv.slice(2))).catch((err) => {
+  encode(cliOpts).catch((err) => {
     if (err instanceof EncodeError) {
       console.error(err.message);
       process.exit(1);

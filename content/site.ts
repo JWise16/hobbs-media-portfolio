@@ -14,6 +14,7 @@ export const brand = {
   wordmark: { word: "Hobbs", rest: "Media Co." },
   /** Sam's first name for TEXT SAM / EMAIL SAM. */
   firstName: "Sam",
+  description: "Real estate photo, film and aerial for Seattle and Puget Sound listings.",
 } as const;
 
 /** The home hero and every share link play this unless a property overrides it. */
@@ -101,8 +102,9 @@ export const copy = {
     kicker: "Get in touch",
     headline: "Have a listing coming up?",
     sentence: todo("copy.contact.sentence", "Send the address and target list date. I reply the same day with availability and a quote."),
-    textSam: "Text Sam",
-    emailSam: "Email Sam",
+    textSam: `Text ${brand.firstName}`,
+    emailSam: `Email ${brand.firstName}`,
+    facts: { basedIn: "Based in", serving: "Serving", instagram: "Instagram", hours: "Hours" },
   },
   hobbsHero: {
     kicker: todo("copy.hobbsHero.kicker", "Real estate media · Est. 2021"),

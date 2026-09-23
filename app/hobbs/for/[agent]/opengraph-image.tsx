@@ -3,6 +3,7 @@ import { makeAgentOg, OG_SIZE } from "@/site/og";
 const og = makeAgentOg("hobbs");
 
 export const dynamic = "force-static";
+export const dynamicParams = false;
 export const size = OG_SIZE;
 export const contentType = "image/png";
 export const alt = "Hobbs Media Co.";

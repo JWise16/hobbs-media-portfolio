@@ -4,8 +4,8 @@ import { launchTheme } from "@/content/config";
 /**
  * Every internal link goes through here. During review paths carry the theme
  * segment (/dark/for/jessica). Once a theme is chosen and `launchTheme` is
- * set, links become theme-less (/for/jessica) and next.config rewrites the
- * root onto the chosen segment (design doc, Next Steps 8).
+ * set, links become theme-less (/for/jessica); the root rewrite that serves
+ * them is added in the same launch change (design doc, Next Steps 8).
  */
 export function href(theme: ThemeId, path = "/"): string {
   const clean = path.startsWith("/") ? path : `/${path}`;

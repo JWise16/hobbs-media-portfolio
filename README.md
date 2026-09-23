@@ -87,10 +87,12 @@ unwrap every `todo()` with Sam's confirmed value, set `launchTheme` in
 | `npm run encode` | footage pipeline (`-- --dry-run`, `-- --force`) |
 | `npm run guard` | placeholder and approval report |
 | `npm test` | Vitest units (encode runs on a 2 s ffmpeg fixture) |
-| `npm run test:e2e` | Playwright: iPhone 14 WebKit + desktop Chromium, plus reduced-motion variants, against `next start` |
+| `npm run test:e2e` | Playwright: iPhone 14 WebKit + desktop Google Chrome (`channel: "chrome"`, for H.264), plus reduced-motion variants, against `next start` |
 | `PREVIEW_URL=https://… npm run test:e2e -- preview-public` | logged-out check against a deployed preview |
 
-Playwright browsers: `npx playwright install chromium webkit`.
+Playwright browsers: `npx playwright install webkit`; the desktop project uses the installed Google Chrome (Playwright's open-source Chromium has no H.264).
+
+Scripts run with `tsx`, which does not load `.env*` by itself; `scripts/guard.ts` and `scripts/encode.ts` read `.env.local` then `.env` for any variable not already set in the shell.
 
 ## Acceptance targets (real-phone check at the four-link milestone)
 

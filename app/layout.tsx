@@ -1,15 +1,16 @@
 import type { Metadata, Viewport } from "next";
 import { siteUrl } from "@/content/config";
+import { brand } from "@/content/site";
 import { isReview } from "@/lib/stage";
 import "./globals.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl()),
   title: {
-    default: "Hobbs Media Co.",
-    template: "%s · Hobbs Media Co.",
+    default: brand.name,
+    template: `%s · ${brand.name}`,
   },
-  description: "Real estate photo, film and aerial for Seattle and Puget Sound listings.",
+  description: brand.description,
   // Every route is noindex while the site is in review (eng 7A). Share links stay noindex at launch.
   robots: isReview() ? { index: false, follow: false } : undefined,
 };

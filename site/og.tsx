@@ -7,6 +7,7 @@ import { findProperty } from "@/content/properties";
 import { brand, contact, heroClip, homePlaque } from "@/content/site";
 import { themes, type ThemeId } from "@/content/themes";
 import type { ClipEntry } from "@/lib/clips.types";
+import { focalToObjectPosition } from "@/lib/heroIsland";
 import { agentParams, propertyParams, type RouteMatch } from "@/site/routes";
 
 /**
@@ -22,11 +23,11 @@ import { agentParams, propertyParams, type RouteMatch } from "@/site/routes";
 export const OG_SIZE = { width: 1200, height: 630 };
 
 /** Literal colors are allowed here only: this is a rasterized image, not a component. */
-const palette: Record<ThemeId, { text: string; muted: string; plaque: string; dim: string }> = {
-  dark: { text: "#F3EFE6", muted: "#8C9BB0", plaque: "#F3EFE6", dim: "rgba(11,13,18,0.35)" },
-  light: { text: "#F3EFE6", muted: "#C9C2B6", plaque: "#F3EFE6", dim: "rgba(42,38,33,0.30)" },
-  twilight: { text: "#EFE6D6", muted: "#C9A24A", plaque: "#EFE6D6", dim: "rgba(18,16,14,0.35)" },
-  hobbs: { text: "#F3EFE6", muted: "#7E8CA0", plaque: "#F3EFE6", dim: "rgba(20,20,20,0.35)" },
+const palette: Record<ThemeId, { text: string; muted: string; dim: string }> = {
+  dark: { text: "#F3EFE6", muted: "#8C9BB0", dim: "rgba(11,13,18,0.35)" },
+  light: { text: "#F3EFE6", muted: "#C9C2B6", dim: "rgba(42,38,33,0.30)" },
+  twilight: { text: "#EFE6D6", muted: "#C9A24A", dim: "rgba(18,16,14,0.35)" },
+  hobbs: { text: "#F3EFE6", muted: "#7E8CA0", dim: "rgba(20,20,20,0.35)" },
 };
 
 export async function readFont(file: string): Promise<ArrayBuffer> {
@@ -73,7 +74,7 @@ export async function renderOg(theme: ThemeId, match: RouteMatch): Promise<Image
     readFont(t.support === "manrope" ? "Manrope-Medium.ttf" : "Satoshi-Medium.ttf"),
     posterDataUrl(clip.files.poster_1920 ?? clip.files.poster),
   ]);
-  const objectPosition = `${Math.round(clip.focal.x * 100)}% ${Math.round(clip.focal.y * 100)}%`;
+  const objectPosition = focalToObjectPosition(clip.focal);
 
   return new ImageResponse(
     (
@@ -116,14 +117,14 @@ export async function renderOg(theme: ThemeId, match: RouteMatch): Promise<Image
               fontFamily: "Support",
               fontSize: 22,
               letterSpacing: "0.28em",
-              color: colors.plaque,
+              color: colors.text,
               textTransform: "uppercase",
             }}
           >
             {line}
           </div>
         </div>
-        <div style={{ position: "absolute", left: 48, bottom: 40, display: "flex", fontFamily: "Support", fontSize: 18, letterSpacing: "0.2em", color: colors.plaque, opacity: 0.8 }}>
+        <div style={{ position: "absolute", left: 48, bottom: 40, display: "flex", fontFamily: "Support", fontSize: 18, letterSpacing: "0.2em", color: colors.text, opacity: 0.8 }}>
           {contact.phoneDisplay}
         </div>
       </div>

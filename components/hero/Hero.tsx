@@ -41,7 +41,9 @@ export function Hero({ theme, clip, plaque, variant, title }: HeroProps) {
         <style>{`.hero{position:relative}.hero-dim,.hero-cue{display:none}`}</style>
       </noscript>
       <div className="hero-text">
-        <Wordmark theme={theme} size={variant === "card" ? "card" : "hero"} onFootage />
+        <h1 className="hero-mark">
+          <Wordmark theme={theme} size={variant === "card" ? "card" : "hero"} onFootage />
+        </h1>
         <Plaque lines={plaque} className="hero-plaque text-hero-text" />
       </div>
       <div className="hero-frame" role="button" tabIndex={0} aria-label={`Play or pause: ${title}`}>

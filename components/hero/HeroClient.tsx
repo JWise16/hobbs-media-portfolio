@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import { applyDimVars, scrollDim } from "@/lib/scrollDim";
 import { videoBudget } from "@/lib/VideoBudget";
 
@@ -20,8 +20,6 @@ export interface HeroClientProps {
  * frame tap/Space toggle playback (6B).
  */
 export function HeroClient({ videoId, src720, src1080, loop, variant }: HeroClientProps) {
-  const cleanupRef = useRef<(() => void) | null>(null);
-
   useEffect(() => {
     const video = document.getElementById(videoId) as HTMLVideoElement | null;
     if (!video) return;
@@ -61,13 +59,12 @@ export function HeroClient({ videoId, src720, src1080, loop, variant }: HeroClie
     frame?.addEventListener("click", onToggle);
     frame?.addEventListener("keydown", onKey);
 
-    cleanupRef.current = () => {
+    return () => {
       frame?.removeEventListener("click", onToggle);
       frame?.removeEventListener("keydown", onKey);
       unsubscribe();
       unregister();
     };
-    return () => cleanupRef.current?.();
   }, [videoId, src720, src1080, loop, variant]);
 
   return null;

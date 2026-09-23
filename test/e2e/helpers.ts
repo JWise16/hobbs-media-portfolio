@@ -1,7 +1,9 @@
 import { expect, type Page } from "@playwright/test";
 
-export const cinematic = ["dark", "light", "twilight"] as const;
-export const allThemes = ["hobbs", ...cinematic] as const;
+import { themeIds, themes } from "../../content/themes";
+
+export const allThemes = themeIds;
+export const cinematic = themeIds.filter((t) => themes[t].hero === "reel");
 
 export async function scrollToFraction(page: Page, fraction: number): Promise<void> {
   await page.evaluate((f) => window.scrollTo(0, Math.ceil(window.innerHeight * f)), fraction);

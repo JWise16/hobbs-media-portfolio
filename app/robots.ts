@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { launchTheme } from "@/content/config";
+import { launchTheme, reviewTheme } from "@/content/config";
 import { isReview } from "@/lib/stage";
 
 /**
@@ -10,11 +10,13 @@ export default function robots(): MetadataRoute.Robots {
   if (isReview()) {
     return { rules: { userAgent: "*", disallow: "/" } };
   }
-  const base = launchTheme ? "" : "/dark";
+  // Next serves the home page without a trailing slash, so the allow must match
+  // the exact path (`/dark$`), or after launch the bare root (`/$`).
+  const home = launchTheme ? "/$" : `/${reviewTheme}$`;
   return {
     rules: {
       userAgent: "*",
-      allow: [`${base}/$`, "/$"],
+      allow: [home],
       disallow: ["/"],
     },
   };
