@@ -5,22 +5,22 @@ import type { ClipEntry } from "@/lib/clips.types";
 export const clips = {
   "needle-above-clouds": {
       "id": "needle-above-clouds",
-      "hash": "d2755835",
-      "entryHash": "4a822006",
+      "hash": "e1f17159",
+      "entryHash": "c112e413",
       "ratio": "16:9",
       "focal": {
           "x": 0.5,
           "y": 0.42
       },
       "loop": "pingpong",
-      "duration": 30.731,
+      "duration": 31.732,
       "approved": false,
       "hero": true,
       "files": {
-          "mp4_720": "/clips/needle-above-clouds.d2755835.720.mp4",
-          "poster": "/clips/needle-above-clouds.d2755835.jpg",
-          "mp4_1080": "/clips/needle-above-clouds.d2755835.1080.mp4",
-          "poster_1920": "/clips/needle-above-clouds.d2755835.poster.1920.jpg"
+          "mp4_720": "/clips/needle-above-clouds.e1f17159.720.mp4",
+          "poster": "/clips/needle-above-clouds.e1f17159.jpg",
+          "mp4_1080": "/clips/needle-above-clouds.e1f17159.1080.mp4",
+          "poster_1920": "/clips/needle-above-clouds.e1f17159.poster.1920.jpg"
       }
   },
   "sailboat-sunset": {
@@ -38,8 +38,8 @@ export const clips = {
       "hero": false,
       "files": {
           "mp4_720": "/clips/sailboat-sunset.e9491097.720.mp4",
-          "poster": "/clips/sailboat-sunset.e9491097.jpg",
           "mp4_1080": "/clips/sailboat-sunset.e9491097.1080.mp4",
+          "poster": "/clips/sailboat-sunset.e9491097.jpg",
           "poster_1920": "/clips/sailboat-sunset.e9491097.poster.1920.jpg"
       }
   },
@@ -58,8 +58,8 @@ export const clips = {
       "hero": false,
       "files": {
           "mp4_720": "/clips/spit-golden-hour.ce507f35.720.mp4",
-          "poster": "/clips/spit-golden-hour.ce507f35.jpg",
           "mp4_1080": "/clips/spit-golden-hour.ce507f35.1080.mp4",
+          "poster": "/clips/spit-golden-hour.ce507f35.jpg",
           "poster_1920": "/clips/spit-golden-hour.ce507f35.poster.1920.jpg"
       }
   },
@@ -78,8 +78,8 @@ export const clips = {
       "hero": false,
       "files": {
           "mp4_720": "/clips/athens-acropolis.c557b3e3.720.mp4",
-          "poster": "/clips/athens-acropolis.c557b3e3.jpg",
           "mp4_1080": "/clips/athens-acropolis.c557b3e3.1080.mp4",
+          "poster": "/clips/athens-acropolis.c557b3e3.jpg",
           "poster_1920": "/clips/athens-acropolis.c557b3e3.poster.1920.jpg"
       }
   },
@@ -98,8 +98,8 @@ export const clips = {
       "hero": false,
       "files": {
           "mp4_720": "/clips/city-rise.adb3e78e.720.mp4",
-          "poster": "/clips/city-rise.adb3e78e.jpg",
           "mp4_1080": "/clips/city-rise.adb3e78e.1080.mp4",
+          "poster": "/clips/city-rise.adb3e78e.jpg",
           "poster_1920": "/clips/city-rise.adb3e78e.poster.1920.jpg"
       }
   },
@@ -118,8 +118,8 @@ export const clips = {
       "hero": false,
       "files": {
           "mp4_720": "/clips/yacht-dusk-wake.6222c0c5.720.mp4",
-          "poster": "/clips/yacht-dusk-wake.6222c0c5.jpg",
           "mp4_1080": "/clips/yacht-dusk-wake.6222c0c5.1080.mp4",
+          "poster": "/clips/yacht-dusk-wake.6222c0c5.jpg",
           "poster_1920": "/clips/yacht-dusk-wake.6222c0c5.poster.1920.jpg"
       }
   },
@@ -138,8 +138,8 @@ export const clips = {
       "hero": false,
       "files": {
           "mp4_720": "/clips/hilltop-tower.0969bd6e.720.mp4",
-          "poster": "/clips/hilltop-tower.0969bd6e.jpg",
           "mp4_1080": "/clips/hilltop-tower.0969bd6e.1080.mp4",
+          "poster": "/clips/hilltop-tower.0969bd6e.jpg",
           "poster_1920": "/clips/hilltop-tower.0969bd6e.poster.1920.jpg"
       }
   },
@@ -158,8 +158,8 @@ export const clips = {
       "hero": false,
       "files": {
           "mp4_720": "/clips/tug-daylight.a691afa4.720.mp4",
-          "poster": "/clips/tug-daylight.a691afa4.jpg",
           "mp4_1080": "/clips/tug-daylight.a691afa4.1080.mp4",
+          "poster": "/clips/tug-daylight.a691afa4.jpg",
           "poster_1920": "/clips/tug-daylight.a691afa4.poster.1920.jpg"
       }
   },
