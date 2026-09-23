@@ -1,9 +1,57 @@
 # TODOS
 
-Planning-stage TODOs for the Hobbs Media Co. portfolio site. Move this file into
+Planning-stage TODOs for the Hobbs Media Co. portfolio site. Moved into
 `JWise16/hobbs-media-portfolio` together with `docs/designs/hobbs-media-portfolio.md`.
 
 ## Hobbs Media portfolio
+
+### Real-phone check at the four-link milestone (T12)
+
+**What:** Two iPhones, cold cellular load, Low Power Mode, background and resume, repeated scrolling; record first-frame time and bytes transferred before the reel plays against the targets (first frame under 1.5 s on LTE, under 4 MB).
+
+**Why:** The only path that cannot be automated. Low Power Mode blocks even muted autoplay, and the tap affordance has been unit-tested with a mocked `play()` but never on a device.
+
+**Context:** Deferred from the plan at ship time (2026-09-22): the review links play synthetic placeholder clips, and the numbers only mean something with Sam's footage encoded. Record results in `docs/designs/hobbs-media-portfolio.md`. Deferred from plan: docs/designs/hobbs-media-portfolio.md (T12).
+
+**Effort:** S
+**Priority:** P1
+**Depends on:** Sam's footage encoded; two iPhones
+
+### Re-render the mobile hero mockup from a real 9:16 crop (D15)
+
+**What:** Regenerate `docs/designs/mockups/variant-D.png` from the `clips/preview/<id>.<hash>.preview-916.jpg` crop of the chosen hero clip before the links go to Sam.
+
+**Why:** The approved mockup shows an imagined composition; the site shows a real cover crop chosen by the manifest `focal`. Sam should see the crop the site will actually show.
+
+**Context:** The encode script already emits the preview crop for every 16:9 clip. Deferred from plan: docs/designs/hobbs-media-portfolio.md (D15). Blocked on real footage.
+
+**Effort:** S
+**Priority:** P1
+**Depends on:** Sam's footage encoded
+
+### Bind the guard to `next build` itself
+
+**What:** Run the SITE_STAGE / placeholder / approval guard from inside the Next build (a `next.config.ts` phase hook or an instrumentation entry) rather than only from the npm `prebuild` lifecycle.
+
+**Why:** A Vercel build-command override of `next build`, or a switch to a package manager that does not run `pre` scripts, skips the guard entirely and a live build could ship placeholders. Raised by the outside (Codex) adversarial review at ship time.
+
+**Context:** `scripts/guard.ts` is already a pure function (`runGuard`) that returns a report; the open question is whether importing content modules from `next.config.ts` is clean under Next 16's config compilation. Until then, keep the Vercel build command at its default (`npm run build`).
+
+**Effort:** S
+**Priority:** P2
+**Depends on:** None
+
+### Focal nudges should not re-encode
+
+**What:** Exclude `focal` and `hero` from the encode content hash and regenerate only the review-only 9:16 preview when they change.
+
+**Why:** `focal` affects only `object-position` and the preview crop, but today it is part of the hash, so every focal adjustment (the README's check-the-crop loop) re-encodes both rungs.
+
+**Context:** The design doc hashes the whole entry JSON on purpose; this is a refinement of that rule, flagged by the adversarial review. The sidecar would need to record focal separately so the preview can be re-cut without ffmpeg re-encoding the loop.
+
+**Effort:** S
+**Priority:** P3
+**Depends on:** None
 
 ### Test one /for/ calling card with one real agent
 
@@ -23,7 +71,7 @@ Planning-stage TODOs for the Hobbs Media Co. portfolio site. Move this file into
 
 **Why:** The texted link is the referral channel. Without a counter nobody knows if a `/for/jessica` link was opened or forwarded. Sam's first question after launch will be "did she open it?"
 
-**Context:** Not in the design doc. Post-launch work; must not touch the four-link build. Vercel Web Analytics has a monthly event cap on Hobby and is paid beyond it; Plausible is paid from day one. Pick the product that follows the hosting decision (design doc open question 6). Spec is three lines: the provider component in the root layout and a `data-event` on the two contact links.
+**Context:** Not in the design doc. Post-launch work; must not touch the four-link build. Vercel Web Analytics has a monthly event cap on Hobby and is paid beyond it; Plausible is paid from day one. Pick the product that follows the hosting decision (design doc open question 6). Spec is three lines: the provider component in the root layout and a `data-event` on the two contact links (the `data-event` attributes already exist on TEXT SAM and EMAIL SAM).
 
 **Effort:** S
 **Priority:** P3
