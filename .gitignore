@@ -25,3 +25,5 @@ blob-report/
 *.log
 # typescript incremental cache
 *.tsbuildinfo
+# gstack local reports
+.gstack/
