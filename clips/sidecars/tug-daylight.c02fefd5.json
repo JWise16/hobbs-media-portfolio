@@ -1,0 +1,30 @@
+{
+  "id": "tug-daylight",
+  "hash": "c02fefd5",
+  "sourceHash": "c7d62767176b8cb306a30e7c4a22530b41e1db8c9f1d2f73a644e144253396aa",
+  "encoderVersion": "2026-09-22.1",
+  "preset": "medium",
+  "entry": {
+    "id": "tug-daylight",
+    "source": "tug-daylight.mp4",
+    "in": 0.5,
+    "out": 8.5,
+    "speed": 1,
+    "focal": {
+      "x": 0.5,
+      "y": 0.4
+    },
+    "loop": "xfade",
+    "ratio": "16:9",
+    "hero": false
+  },
+  "duration": 7.508,
+  "files": {
+    "mp4_720": "/clips/tug-daylight.c02fefd5.720.mp4",
+    "poster": "/clips/tug-daylight.c02fefd5.jpg",
+    "mp4_1080": "/clips/tug-daylight.c02fefd5.1080.mp4",
+    "poster_1920": "/clips/tug-daylight.c02fefd5.poster.1920.jpg"
+  },
+  "preview": "tug-daylight.c02fefd5.preview-916.jpg",
+  "encodedAt": "2026-09-23T01:38:41.496Z"
+}

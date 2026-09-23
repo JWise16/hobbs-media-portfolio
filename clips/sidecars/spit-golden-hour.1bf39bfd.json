@@ -1,0 +1,30 @@
+{
+  "id": "spit-golden-hour",
+  "hash": "1bf39bfd",
+  "sourceHash": "24b8c07b30b79786d340f8f6c0cbe635ef278563e8e44eb5e9b93806c324a90a",
+  "encoderVersion": "2026-09-22.1",
+  "preset": "medium",
+  "entry": {
+    "id": "spit-golden-hour",
+    "source": "spit-golden-hour.mp4",
+    "in": 0,
+    "out": 10,
+    "speed": 1,
+    "focal": {
+      "x": 0.4,
+      "y": 0.5
+    },
+    "loop": "xfade",
+    "ratio": "16:9",
+    "hero": false
+  },
+  "duration": 9.509,
+  "files": {
+    "mp4_720": "/clips/spit-golden-hour.1bf39bfd.720.mp4",
+    "poster": "/clips/spit-golden-hour.1bf39bfd.jpg",
+    "mp4_1080": "/clips/spit-golden-hour.1bf39bfd.1080.mp4",
+    "poster_1920": "/clips/spit-golden-hour.1bf39bfd.poster.1920.jpg"
+  },
+  "preview": "spit-golden-hour.1bf39bfd.preview-916.jpg",
+  "encodedAt": "2026-09-23T01:38:37.778Z"
+}

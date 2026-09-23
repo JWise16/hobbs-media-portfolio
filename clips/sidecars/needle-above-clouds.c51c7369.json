@@ -1,0 +1,30 @@
+{
+  "id": "needle-above-clouds",
+  "hash": "c51c7369",
+  "sourceHash": "e99b8ce803f0b15743c51b1a88fa88ceebd801df6acd9ed56059be22f194b67d",
+  "encoderVersion": "2026-09-22.1",
+  "preset": "medium",
+  "entry": {
+    "id": "needle-above-clouds",
+    "source": "needle-above-clouds.mp4",
+    "in": 20.5,
+    "out": 31.5,
+    "speed": 1,
+    "focal": {
+      "x": 0.5,
+      "y": 0.45
+    },
+    "loop": "xfade",
+    "ratio": "16:9",
+    "hero": true
+  },
+  "duration": 10.511,
+  "files": {
+    "mp4_720": "/clips/needle-above-clouds.c51c7369.720.mp4",
+    "poster": "/clips/needle-above-clouds.c51c7369.jpg",
+    "mp4_1080": "/clips/needle-above-clouds.c51c7369.1080.mp4",
+    "poster_1920": "/clips/needle-above-clouds.c51c7369.poster.1920.jpg"
+  },
+  "preview": "needle-above-clouds.c51c7369.preview-916.jpg",
+  "encodedAt": "2026-09-23T01:38:16.745Z"
+}
