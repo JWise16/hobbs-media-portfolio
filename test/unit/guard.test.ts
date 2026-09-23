@@ -24,7 +24,7 @@ describe("guard report (T6, T2, 17A)", () => {
     const r = await runGuard({ SITE_STAGE: "review" });
     expect(r.ok).toBe(true);
     expect(r.todos.length).toBeGreaterThan(10);
-    expect(r.todos.map((t) => t.label)).toContain("contact.phone");
+    expect(r.todos.map((t) => t.label)).toContain("contact.email");
     expect(r.unapprovedClips).toContain("sailboat-sunset");
     expect(r.limitViolations).toEqual([]);
     expect(r.plaqueLimitViolations).toEqual([]);
@@ -36,7 +36,7 @@ describe("guard report (T6, T2, 17A)", () => {
     expect(r.ok).toBe(false);
     const text = r.lines.join("\n");
     expect(text).toContain("FAIL: SITE_STAGE=live refuses");
-    expect(text).toContain("contact.phone");
+    expect(text).toContain("contact.email");
     expect(text).toContain("stats.homes");
     expect(text).toContain("sailboat-sunset");
   });
