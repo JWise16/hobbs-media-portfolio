@@ -6,7 +6,7 @@ import { ogPlaqueLine } from "@/site/og";
 import { themeIds, themes, isThemeId } from "@/content/themes";
 
 describe("href() (theme segment during review)", () => {
-  it("prefixes the theme and collapses once launchTheme is set", () => {
+  it("prefixes the theme during review (the collapsed form is covered in href.launch.test.ts)", () => {
     expect(href("dark")).toBe("/dark");
     expect(href("dark", "/for/jessica")).toBe("/dark/for/jessica");
     expect(homeHref("hobbs")).toBe("/hobbs");

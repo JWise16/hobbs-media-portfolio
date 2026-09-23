@@ -1,7 +1,7 @@
 // @vitest-environment happy-dom
 import { describe, expect, it, vi } from "vitest";
 import { escapeAttr, escapeScript, focalToObjectPosition, heroVideoId, renderHeroIsland } from "@/lib/heroIsland";
-import { HERO_INIT_SOURCE, heroInit } from "@/lib/playbackPolicy";
+import { DESKTOP_QUERY, HERO_INIT_SOURCE, REDUCED_MOTION_QUERY, heroInit } from "@/lib/playbackPolicy";
 
 const base = {
   id: "sunset",
@@ -39,6 +39,10 @@ describe("renderHeroIsland", () => {
   it("embeds the shared heroInit source verbatim and calls it on the previous sibling", () => {
     const html = renderHeroIsland(base);
     expect(html).toContain(HERO_INIT_SOURCE);
+    // The inline script must keep the same media queries the controller uses.
+    expect(HERO_INIT_SOURCE).toContain(DESKTOP_QUERY);
+    expect(HERO_INIT_SOURCE).toContain(REDUCED_MOTION_QUERY);
+    expect(html).toContain(`data-src-720="/clips/sunset.deadbeef.720.mp4"`);
     expect(html).toContain("(document.currentScript.previousElementSibling)");
     expect(html.indexOf("<video")).toBeLessThan(html.indexOf("<script>"));
   });
@@ -163,10 +167,31 @@ describe("heroInit (the inline script, executed standalone)", () => {
   it("a video error after the poster marks the state and leaves the poster", async () => {
     stubMatchMedia({});
     stubImage(true);
-    const v = makeVideo({ src: "/720.mp4", poster: "/p.jpg", "data-hero-init": "0" }, () => Promise.resolve());
+    const v = makeVideo({ src: "/720.mp4", "data-src-720": "/720.mp4", poster: "/p.jpg", "data-hero-init": "0" }, () => Promise.resolve());
     heroInit(v);
     v.dispatchEvent(new Event("error"));
     expect(v.getAttribute("data-hero-state")).toBe("error");
     expect(v.getAttribute("poster")).toBe("/p.jpg");
+  });
+
+  it("a broken 1080 rung falls back to the 720 rung once, then errors", async () => {
+    stubMatchMedia({ "(min-width: 1024px)": true });
+    stubImage(true);
+    const v = makeVideo(
+      { src: "/720.mp4", "data-src-720": "/720.mp4", "data-src-1080": "/1080.mp4", poster: "/p.jpg", "data-hero-init": "0" },
+      () => Promise.resolve(),
+    );
+    v.load = vi.fn();
+    heroInit(v);
+    await tick();
+    expect(v.getAttribute("src")).toBe("/1080.mp4");
+    v.dispatchEvent(new Event("error"));
+    expect(v.getAttribute("src")).toBe("/720.mp4");
+    expect(v.getAttribute("data-rung")).toBe("720");
+    expect(v.load).toHaveBeenCalled();
+    expect(v.play).toHaveBeenCalledTimes(2);
+    expect(v.getAttribute("data-hero-state")).not.toBe("error");
+    v.dispatchEvent(new Event("error"));
+    expect(v.getAttribute("data-hero-state")).toBe("error");
   });
 });

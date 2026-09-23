@@ -9,6 +9,7 @@ import {
   doubleBitrate,
   encode,
   outputNames,
+  parseArgs,
   parseManifest,
   parseRational,
   preflight,
@@ -55,6 +56,7 @@ interface Workspace {
   root: string;
   manifestPath: string;
   outDir: string;
+  sidecarDir: string;
   previewDir: string;
   indexPath: string;
   opts: EncodeOptions;
@@ -66,6 +68,7 @@ function workspace(): Workspace {
   const root = tmpWorkspace();
   const manifestPath = path.join(root, "manifest.json");
   const outDir = path.join(root, "public/clips");
+  const sidecarDir = path.join(root, "sidecars");
   const previewDir = path.join(root, "preview");
   const indexPath = path.join(root, "content/clips.generated.ts");
   const calls = { ffmpeg: 0 };
@@ -76,6 +79,7 @@ function workspace(): Workspace {
   const opts: EncodeOptions = {
     manifestPath,
     outDir,
+    sidecarDir,
     previewDir,
     indexPath,
     sourceDir: fx.dir,
@@ -88,6 +92,7 @@ function workspace(): Workspace {
     root,
     manifestPath,
     outDir,
+    sidecarDir,
     previewDir,
     indexPath,
     opts,
@@ -362,7 +367,9 @@ describe("encode (real ffmpeg on the 2 s fixture)", () => {
       expect(files).toContain(`${base}.720.mp4`);
       expect(files).toContain(`${base}.jpg`);
       expect(files).toContain(`${base}.poster.1920.jpg`);
-      expect(files).toContain(`${base}.json`);
+      // sidecars carry the source path and never sit under public/
+      expect(files).not.toContain(`${base}.json`);
+      expect(fs.existsSync(path.join(ws.sidecarDir, `${base}.json`))).toBe(true);
       expect(entry.files.mp4_720).toBe(`/clips/${base}.720.mp4`);
       expect(entry.files.mp4_1080).toBe(`/clips/${base}.1080.mp4`);
       expect(entry.files.poster).toBe(`/clips/${base}.jpg`);
@@ -370,8 +377,8 @@ describe("encode (real ffmpeg on the 2 s fixture)", () => {
       // review-only 9:16 preview lands outside public/
       expect(fs.existsSync(path.join(ws.previewDir, `${base}.preview-916.jpg`))).toBe(true);
     }
-    // no temp dir left behind
-    expect(fs.existsSync(path.join(ws.outDir, ".tmp"))).toBe(false);
+    // no temp dir or lock left behind
+    expect(fs.readdirSync(ws.outDir).filter((f) => f.startsWith(".tmp") || f === ".encode.lock")).toEqual([]);
 
     // rung sizes and poster widths
     const sunset = s.index.sunset;
@@ -432,10 +439,11 @@ describe("encode (real ffmpeg on the 2 s fixture)", () => {
     const s2 = await encode(ws.opts);
     expect(s2.encoded).toEqual(["sunset"]);
     expect(s2.index.sunset.hash).not.toBe(oldHash);
-    // 1080, 720, poster, poster.1920, sidecar in public/clips plus the preview-916
+    // 1080, 720, poster, poster.1920 in public/clips, the sidecar, and the preview-916
     expect(s2.pruned.filter((f) => f.includes(oldHash)).length).toBe(6);
     const left = fs.readdirSync(ws.outDir).filter((f) => f.includes(oldHash));
     expect(left).toEqual([]);
+    expect(fs.readdirSync(ws.sidecarDir).filter((f) => f.includes(oldHash))).toEqual([]);
     expect(fs.readdirSync(ws.previewDir).filter((f) => f.includes(oldHash))).toEqual([]);
   });
 
@@ -496,8 +504,57 @@ describe("encode (real ffmpeg on the 2 s fixture)", () => {
     };
     const e = await expectCode(encode({ ...ws.opts, exec: failing }), "ENCODE_FAILED");
     expect(e.message).toContain("simulated crash");
-    expect(fs.existsSync(path.join(ws.outDir, ".tmp"))).toBe(false);
     expect(fs.readdirSync(ws.outDir)).toEqual([]);
+    expect(fs.readdirSync(ws.sidecarDir)).toEqual([]);
     expect(fs.existsSync(ws.indexPath)).toBe(false);
+  });
+});
+
+describe("encode: locking, sidecar trust, CLI args", () => {
+  it("refuses to run while another encode holds the lock, and clears it afterwards", async () => {
+    const ws = workspace();
+    ws.writeManifest(manifestOf(baseEntry({ id: "sunset" })));
+    fs.mkdirSync(ws.outDir, { recursive: true });
+    fs.writeFileSync(path.join(ws.outDir, ".encode.lock"), "999999\n");
+    const e = await expectCode(encode(ws.opts), "LOCKED");
+    expect(e.message).toContain(".encode.lock");
+    fs.rmSync(path.join(ws.outDir, ".encode.lock"));
+    await encode(ws.opts);
+    expect(fs.existsSync(path.join(ws.outDir, ".encode.lock"))).toBe(false);
+  });
+
+  it("ignores a sidecar that names another clip's files or fails the schema", async () => {
+    const ws = workspace();
+    ws.writeManifest(manifestOf(baseEntry({ id: "sunset" })));
+    const s1 = await encode(ws.opts);
+    const sidecarPath = path.join(ws.sidecarDir, `sunset.${s1.index.sunset.hash}.json`);
+    const good = JSON.parse(fs.readFileSync(sidecarPath, "utf8"));
+    // Same shape, wrong files: must re-encode rather than trust it.
+    fs.writeFileSync(sidecarPath, JSON.stringify({ ...good, files: { ...good.files, mp4_720: "/clips/other.deadbeef.720.mp4" } }));
+    const s2 = await encode(ws.opts);
+    expect(s2.encoded).toEqual(["sunset"]);
+    // Missing duration: schema rejects, re-encode.
+    const again = JSON.parse(fs.readFileSync(sidecarPath, "utf8"));
+    delete again.duration;
+    fs.writeFileSync(sidecarPath, JSON.stringify(again));
+    const s3 = await encode(ws.opts);
+    expect(s3.encoded).toEqual(["sunset"]);
+    // Untouched: skipped.
+    const s4 = await encode(ws.opts);
+    expect(s4.skipped).toEqual(["sunset"]);
+    expect(JSON.parse(fs.readFileSync(sidecarPath, "utf8")).sourceHash).toMatch(/^[0-9a-f]{64}$/);
+  });
+
+  it("parses CLI flags and rejects a trailing or unknown flag with a usage error", () => {
+    expect(parseArgs(["--force", "--dry-run", "--preset", "slow", "--manifest", "m.json", "--out", "o"])).toMatchObject({
+      force: true,
+      dryRun: true,
+      preset: "slow",
+      manifestPath: path.resolve("m.json"),
+      outDir: path.resolve("o"),
+    });
+    expect(parseArgs([])).toEqual({});
+    expect(() => parseArgs(["--manifest"])).toThrow();
+    expect(() => parseArgs(["--bogus"])).toThrow();
   });
 });

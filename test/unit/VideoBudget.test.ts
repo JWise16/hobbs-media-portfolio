@@ -14,7 +14,12 @@ let mediaFlags: Record<string, boolean> = {};
 function fakeVideo(top: number, height = 400, playResult: "ok" | "reject" = "ok"): Fake {
   const el = document.createElement("video");
   const rect = { top, bottom: top + height };
-  const play = vi.fn(() => (playResult === "ok" ? Promise.resolve() : Promise.reject(new Error("NotAllowedError"))));
+  const play = vi.fn(() => {
+    if (playResult === "ok") return Promise.resolve();
+    const err = new Error("play() failed because the user didn't interact");
+    err.name = "NotAllowedError";
+    return Promise.reject(err);
+  });
   const pause = vi.fn();
   el.play = play as unknown as typeof el.play;
   el.pause = pause as unknown as typeof el.pause;
@@ -25,9 +30,12 @@ function fakeVideo(top: number, height = 400, playResult: "ok" | "reject" = "ok"
 
 const flush = () => new Promise((r) => setTimeout(r, 0));
 
+const OriginalImage = window.Image;
+
 beforeEach(() => {
   document.body.innerHTML = "";
   mediaFlags = {};
+  (window as unknown as { Image: unknown }).Image = OriginalImage;
   window.matchMedia = vi.fn((q: string) => ({ matches: !!mediaFlags[q], addEventListener() {}, removeEventListener() {} }) as unknown as MediaQueryList);
   Object.defineProperty(window, "innerHeight", { value: 800, configurable: true });
   Object.defineProperty(document, "visibilityState", { value: "visible", configurable: true });
@@ -56,7 +64,8 @@ describe("VideoBudget", () => {
     reg(b, gone);
     b.update(); // attach pass
     expect(a.el.getAttribute("src")).toBe("/x.720.mp4");
-    expect(a.el.getAttribute("preload")).toBe("auto");
+    // attach fetches metadata only; play() bumps to auto
+    expect(far.el.getAttribute("preload")).toBe("metadata");
     expect(far.el.getAttribute("src")).toBe("/x.720.mp4");
     expect(gone.el.getAttribute("src")).toBeNull();
     b.update(); // play pass
@@ -101,6 +110,56 @@ describe("VideoBudget", () => {
     b.update();
     expect(a.el.getAttribute("src")).toBe("/x.1080.mp4");
     expect(a.el.getAttribute("data-rung")).toBe("1080");
+  });
+
+  it("a stale AbortError from an interrupting pause never marks the clip blocked (fast scroll)", async () => {
+    const b = budget();
+    const a = fakeVideo(100);
+    let rejectFirst: ((e: Error) => void) | null = null;
+    a.play.mockImplementationOnce(() => new Promise<void>((_, rej) => (rejectFirst = rej)));
+    reg(b, a);
+    b.update();
+    b.update();
+    expect(a.el.getAttribute("data-state")).toBe("playing");
+    // Scroll away: pause interrupts the pending play(); the browser rejects the old promise with AbortError.
+    a.rect = { top: 3000, bottom: 3400 };
+    b.update();
+    const abort = new Error("The play() request was interrupted");
+    abort.name = "AbortError";
+    rejectFirst!(abort);
+    await flush();
+    expect(a.el.getAttribute("data-state")).toBe("detached");
+    // Back in view: plays again, never blocked.
+    a.rect = { top: 100, bottom: 500 };
+    b.update();
+    b.update();
+    await flush();
+    expect(a.el.getAttribute("data-state")).toBe("playing");
+  });
+
+  it("a broken 1080 rung falls back to 720 once; a second error keeps the poster and excludes the clip", async () => {
+    mediaFlags["(min-width: 1024px)"] = true;
+    const b = budget();
+    const a = fakeVideo(100);
+    reg(b, a);
+    b.update();
+    expect(a.el.getAttribute("src")).toBe("/x.1080.mp4");
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    a.el.dispatchEvent(new Event("error"));
+    expect(a.el.getAttribute("src")).toBe("/x.720.mp4");
+    expect(a.el.getAttribute("data-rung")).toBe("720");
+    b.update();
+    await flush();
+    expect(a.el.getAttribute("data-state")).toBe("playing");
+    a.el.dispatchEvent(new Event("error"));
+    expect(a.el.getAttribute("data-state")).toBe("attached");
+    a.play.mockClear();
+    b.update();
+    b.update();
+    expect(a.play).not.toHaveBeenCalled(); // errored: never a candidate until a tap
+    b.toggle(a.el);
+    expect(a.play).toHaveBeenCalledTimes(1);
+    warn.mockRestore();
   });
 
   it("play() rejection → BLOCKED with the affordance state; a tap retries", async () => {
