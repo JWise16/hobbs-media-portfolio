@@ -13,7 +13,7 @@
       "loop": "pingpong",
       "ratio": "16:9",
       "hero": true,
-      "approved": false
+      "approved": true
     },
     {
       "id": "sailboat-sunset",
@@ -28,7 +28,7 @@
       "loop": "pingpong",
       "ratio": "16:9",
       "hero": false,
-      "approved": false
+      "approved": true
     },
     {
       "id": "spit-golden-hour",
@@ -43,7 +43,7 @@
       "loop": "xfade",
       "ratio": "16:9",
       "hero": false,
-      "approved": false
+      "approved": true
     },
     {
       "id": "athens-acropolis",
@@ -58,7 +58,7 @@
       "loop": "pingpong",
       "ratio": "16:9",
       "hero": false,
-      "approved": false
+      "approved": true
     },
     {
       "id": "city-rise",
@@ -73,7 +73,7 @@
       "loop": "pingpong",
       "ratio": "16:9",
       "hero": false,
-      "approved": false
+      "approved": true
     },
     {
       "id": "yacht-dusk-wake",
@@ -88,7 +88,7 @@
       "loop": "xfade",
       "ratio": "16:9",
       "hero": false,
-      "approved": false
+      "approved": true
     },
     {
       "id": "hilltop-tower",
@@ -103,7 +103,7 @@
       "loop": "xfade",
       "ratio": "16:9",
       "hero": false,
-      "approved": false
+      "approved": true
     },
     {
       "id": "tug-daylight",
@@ -118,7 +118,7 @@
       "loop": "xfade",
       "ratio": "16:9",
       "hero": false,
-      "approved": false
+      "approved": true
     }
   ]
 }

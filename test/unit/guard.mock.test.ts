@@ -65,7 +65,7 @@ describe("guard report branches", () => {
     expect(r.integrity).toEqual(['properties[orphan].agent "nobody" does not match any agent slug']);
     expect(r.limitViolations.map((v) => v.what)).toEqual(["agents[long].displayName", "agents[long].brokerage", "properties[orphan].title"]);
     expect(r.plaqueLimitViolations.map((v) => v.what)).toEqual(["/for/long plaque line 1", "/for/long plaque line 2", "/p/orphan plaque line 1"]);
-    expect(r.unapprovedClips).toEqual(["needle-above-clouds", "tug-daylight"]);
+    expect(r.unapprovedClips).toEqual([]);
     const text = r.lines.join("\n");
     expect(text).toContain("Over-limit strings (design 17A):");
     expect(text).toContain('agents[long].displayName: "Alexandria Montgomery-Whitfield" is 31 characters (limit 24)');
@@ -136,7 +136,7 @@ describe("guard report branches", () => {
       "@/clips/manifest.json": () => ({
         default: {
           clips: [
-            ...edited.filter((c) => c.id !== "tug-daylight").map((c) => (c.id === "sailboat-sunset" ? { ...c, approved: true } : c)),
+            ...edited.filter((c) => c.id !== "tug-daylight").map((c) => (c.id === "sailboat-sunset" ? { ...c, approved: false } : c)),
             { ...manifest.default.clips[0], id: "brand-new" },
           ],
         },
@@ -146,7 +146,7 @@ describe("guard report branches", () => {
     expect(r.ok).toBe(false);
     expect(r.integrity).toEqual([
       'clips.generated.ts has "tug-daylight" but clips/manifest.json does not: run npm run encode',
-      '"sailboat-sunset" approved=true in the manifest but false in the index: run npm run encode',
+      '"sailboat-sunset" approved=false in the manifest but true in the index: run npm run encode',
       '"spit-golden-hour" was edited in the manifest after the last encode (in/out/speed/focal/loop/ratio/source): run npm run encode',
       'clips/manifest.json has "brand-new" but clips.generated.ts does not: run npm run encode',
     ]);

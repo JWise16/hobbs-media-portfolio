@@ -21,15 +21,18 @@ export function ContactActions({ variant }: { variant: "section" | "card" }) {
 
 export function ContactLines({ variant }: { variant: "section" | "card" }) {
   if (variant === "card") {
+    const instagram = contactLinks.instagram();
     return (
       <p className="beat-two-details body-muted">
         <a href={contactLinks.tel()} className="tap tabular">
           {contact.phoneDisplay}
         </a>
         <span>{contact.email}</span>
-        <a href={contactLinks.instagram()} className="tap" rel="noopener">
-          @{contact.instagram}
-        </a>
+        {instagram ? (
+          <a href={instagram} className="tap" rel="noopener">
+            @{contact.instagram}
+          </a>
+        ) : null}
       </p>
     );
   }
