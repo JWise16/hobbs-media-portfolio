@@ -2,6 +2,20 @@
 
 All notable changes to the Hobbs Media Co. site. Versions are `MAJOR.MINOR.PATCH.MICRO`.
 
+## [0.2.0.0] - 2026-09-24
+
+### Added
+- Launched at https://hobbsmediaco.com from Sam's Vercel account, on his domain. Production is the `live` branch; `main` and pull requests build previews.
+- `dark` is the site: with `launchTheme` set, links are theme-less, the bare root is served from `/dark`, `/dark/*` 301s to `/*` (share-image paths exempted), and at `live` the other three themes and the sample calling cards 404.
+- Documentation for Sam: the README is now his plain-language guide (what he can change, how a change flows from request to preview to publish, adding a video from a Drive link). Technical reference moved to `docs/developing.md`. `CLAUDE.md` gains rules and recipes for coding agents working with him; `AGENTS.md` points there.
+
+### Changed
+- Every clip approved and every fact confirmed by Sam; no placeholder remains. Instagram is hidden (no handle) and the stats row is empty (no invented numbers). The sample agent and property cards are review-only.
+- The guard requires a launch theme at `live`.
+
+### Removed
+- The one-time setup and finishing docs for Sam (`docs/sam-setup.md`, `docs/sam-finish.md`); their steps are done.
+
 ## [0.1.0.0] - 2026-09-22
 
 ### Added
