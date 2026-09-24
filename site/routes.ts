@@ -1,6 +1,8 @@
 import { agents } from "@/content/agents";
+import { launchTheme } from "@/content/config";
 import { properties } from "@/content/properties";
 import type { ThemeId } from "@/content/themes";
+import { stage } from "@/lib/stage";
 
 /**
  * Every theme has three routes: /<theme>, /<theme>/for/[agent], and
@@ -11,6 +13,15 @@ export type RouteMatch =
   | { kind: "home" }
   | { kind: "agent"; slug: string }
   | { kind: "property"; slug: string };
+
+/**
+ * Once a launch theme is chosen, the other three exist on review links only.
+ * At SITE_STAGE=live their routes 404 (design Next Steps 8: "the other three
+ * roots stop existing").
+ */
+export function retiredAtLive(theme: ThemeId): boolean {
+  return stage() === "live" && launchTheme !== null && theme !== launchTheme;
+}
 
 export function agentParams(): Array<{ agent: string }> {
   return agents.map((a) => ({ agent: a.slug }));

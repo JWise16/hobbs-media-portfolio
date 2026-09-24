@@ -1,5 +1,6 @@
 import fs from "node:fs/promises";
 import path from "node:path";
+import { notFound } from "next/navigation";
 import { ImageResponse } from "next/og";
 import { findAgent } from "@/content/agents";
 import { clips, type ClipId } from "@/content/clips.generated";
@@ -8,7 +9,7 @@ import { brand, contact, heroClip, homePlaque } from "@/content/site";
 import { themes, type ThemeId } from "@/content/themes";
 import type { ClipEntry } from "@/lib/clips.types";
 import { focalToObjectPosition } from "@/lib/heroIsland";
-import { agentParams, propertyParams, type RouteMatch } from "@/site/routes";
+import { agentParams, propertyParams, retiredAtLive, type RouteMatch } from "@/site/routes";
 
 /**
  * Per-route OpenGraph image (eng 1A, T1; design 10A): poster frame, the
@@ -140,19 +141,30 @@ export async function renderOg(theme: ThemeId, match: RouteMatch): Promise<Image
 }
 
 export function makeHomeOg(theme: ThemeId) {
-  return { Image: () => renderOg(theme, { kind: "home" }) };
+  return {
+    Image: () => {
+      if (retiredAtLive(theme)) notFound();
+      return renderOg(theme, { kind: "home" });
+    },
+  };
 }
 
 export function makeAgentOg(theme: ThemeId) {
   return {
-    Image: async ({ params }: { params: Promise<{ agent: string }> }) => renderOg(theme, { kind: "agent", slug: (await params).agent }),
+    Image: async ({ params }: { params: Promise<{ agent: string }> }) => {
+      if (retiredAtLive(theme)) notFound();
+      return renderOg(theme, { kind: "agent", slug: (await params).agent });
+    },
     generateStaticParams: agentParams,
   };
 }
 
 export function makePropertyOg(theme: ThemeId) {
   return {
-    Image: async ({ params }: { params: Promise<{ slug: string }> }) => renderOg(theme, { kind: "property", slug: (await params).slug }),
+    Image: async ({ params }: { params: Promise<{ slug: string }> }) => {
+      if (retiredAtLive(theme)) notFound();
+      return renderOg(theme, { kind: "property", slug: (await params).slug });
+    },
     generateStaticParams: propertyParams,
   };
 }

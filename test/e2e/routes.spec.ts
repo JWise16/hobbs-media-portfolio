@@ -4,24 +4,28 @@ import { work } from "../../content/work";
 import { allThemes } from "./helpers";
 
 test.describe("routes, metadata, caching", () => {
-  test("/ redirects to /dark during review", async ({ page }) => {
+  test("the bare root serves the launch theme and /dark collapses onto it", async ({ page, request }) => {
     await page.goto("/");
-    await expect(page).toHaveURL(/\/dark$/);
+    await expect(page).toHaveURL(/\/$/);
+    await expect(page.locator("[data-theme]")).toHaveAttribute("data-theme", "dark");
+    const res = await request.get("/dark/for/jessica", { maxRedirects: 0 });
+    expect(res.status()).toBe(308);
+    expect(res.headers()["location"]).toMatch(/\/for\/jessica$/);
   });
 
   test("unknown agent, property, and theme are 404s, never redirects", async ({ page, request }) => {
-    for (const path of ["/dark/for/nobody", "/dark/p/nowhere", "/neon", "/dark/about"]) {
+    for (const path of ["/for/nobody", "/p/nowhere", "/neon", "/about", "/light/for/nobody"]) {
       const res = await request.get(path, { maxRedirects: 0 });
       expect(res.status(), path).toBe(404);
     }
-    await page.goto("/dark/for/nobody");
+    await page.goto("/for/nobody");
     await expect(page.getByRole("heading", { name: "That link isn't live." })).toBeVisible();
     await expect(page.getByRole("link", { name: /text sam/i })).toHaveAttribute("href", /^sms:/);
-    await expect(page.locator("main a.tracked[href='/dark']")).toHaveText(/hobbs media co\. home/i);
+    await expect(page.locator("main a.tracked[href='/']")).toHaveText(/hobbs media co\. home/i);
   });
 
   test("every route is noindex in review; robots.txt lets crawlers fetch pages so they can read it", async ({ page, request }) => {
-    for (const path of ["/dark", "/hobbs", "/dark/for/jessica", "/dark/p/ocean-ave"]) {
+    for (const path of ["/", "/hobbs", "/for/jessica", "/p/ocean-ave"]) {
       await page.goto(path);
       await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", /noindex/);
     }
@@ -73,7 +77,7 @@ test.describe("routes, metadata, caching", () => {
     await expect(page.getByRole("heading", { level: 2, name: "Jessica Tran · Windermere" })).toBeVisible();
     // One h1 per page: the wordmark in the hero.
     expect(await page.locator("h1").count()).toBe(1);
-    await expect(page.getByRole("link", { name: /selected work/i })).toHaveAttribute("href", "/dark#work");
+    await expect(page.getByRole("link", { name: /selected work/i })).toHaveAttribute("href", "/#work");
     // Property card names the property and the agent.
     await page.goto("/dark/p/ocean-ave");
     await expect(page.locator(".hero-plaque")).toContainText("1234 OCEAN AVE");

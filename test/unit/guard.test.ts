@@ -24,7 +24,7 @@ describe("guard report (T6, T2, 17A)", () => {
     const r = await runGuard({ SITE_STAGE: "review" });
     expect(r.ok).toBe(true);
     expect(r.todos.length).toBeGreaterThan(0);
-    expect(r.todos.map((t) => t.label)).toContain("contact.email");
+    expect(r.todos.map((t) => t.label)).toContain("agents.jessica.displayName");
     expect(r.unapprovedClips).toEqual([]);
     expect(r.limitViolations).toEqual([]);
     expect(r.plaqueLimitViolations).toEqual([]);
@@ -36,7 +36,8 @@ describe("guard report (T6, T2, 17A)", () => {
     expect(r.ok).toBe(false);
     const text = r.lines.join("\n");
     expect(text).toContain("FAIL: SITE_STAGE=live refuses");
-    expect(text).toContain("contact.email");
+    // The sample cards were loaded under review in this process; at a real live build they are absent.
+    expect(text).toContain("agents.jessica.displayName");
     expect(text).toContain("Unconfirmed facts (");
   });
 

@@ -1,11 +1,26 @@
 import type { NextConfig } from "next";
-import { reviewTheme } from "./content/config";
+import { launchTheme, reviewTheme } from "./content/config";
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
-  // Reviewers open /<theme>; the bare root goes to the mockup reference theme.
+  // Before a theme is chosen, reviewers open /<theme> and the bare root goes to
+  // the mockup reference theme. Once `launchTheme` is set (design Next Steps 8)
+  // the segment collapses: /<theme>/* 301s to /* (opengraph-image paths
+  // exempted, since the og:image URLs keep their segment) and the rewrite below
+  // serves /* from /<theme>/*.
   async redirects() {
-    return [{ source: "/", destination: `/${reviewTheme}`, permanent: false }];
+    if (!launchTheme) return [{ source: "/", destination: `/${reviewTheme}`, permanent: false }];
+    return [
+      { source: `/${launchTheme}`, destination: "/", permanent: true },
+      { source: `/${launchTheme}/:path((?!.*opengraph-image).*)`, destination: "/:path", permanent: true },
+    ];
+  },
+  async rewrites() {
+    if (!launchTheme) return { beforeFiles: [], afterFiles: [], fallback: [] };
+    // fallback: only when no file, page, or dynamic route matched (so
+    // /dark/for/x/opengraph-image is not rewritten onto itself). Everything
+    // left over, including the bare root, is served from the launch theme.
+    return { beforeFiles: [], afterFiles: [], fallback: [{ source: "/:path*", destination: `/${launchTheme}/:path*` }] };
   },
   async headers() {
     return [

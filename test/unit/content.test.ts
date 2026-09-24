@@ -6,13 +6,13 @@ import { ogPlaqueLine } from "@/site/og";
 import { themeIds, themes, isThemeId } from "@/content/themes";
 
 describe("href() (theme segment during review)", () => {
-  it("prefixes the theme during review (the collapsed form is covered in href.launch.test.ts)", () => {
-    expect(href("dark")).toBe("/dark");
-    expect(href("dark", "/for/jessica")).toBe("/dark/for/jessica");
+  it("collapses the launch theme (dark) and keeps the segment for the other three", () => {
+    expect(href("dark")).toBe("/");
+    expect(href("dark", "/for/jessica")).toBe("/for/jessica");
+    expect(propertyHref("dark", "ocean-ave")).toBe("/p/ocean-ave");
     expect(homeHref("hobbs")).toBe("/hobbs");
     expect(workHref("light")).toBe("/light#work");
     expect(agentHref("twilight", "jessica")).toBe("/twilight/for/jessica");
-    expect(propertyHref("dark", "ocean-ave")).toBe("/dark/p/ocean-ave");
   });
 });
 

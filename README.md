@@ -90,9 +90,14 @@ malformed slugs. At `live` it additionally requires `SITE_URL` to be an
 absolute https URL (og:image links depend on it) and refuses any unapproved
 clip still in the publication set, even one nothing references.
 
-Launch is: set `SITE_STAGE=live` and `SITE_URL` in Vercel, mark clips
-`approved: true`, unwrap every `todo()` with Sam's confirmed value, set
-`launchTheme` in `content/config.ts`, deploy.
+Launch state (2026-09-24): every clip is approved, every `todo()` is
+resolved, `launchTheme` is `dark`, and `SITE_URL` is set on Vercel Production.
+With a launch theme set, next.config serves the bare root from `/dark`
+(fallback rewrite) and 301s `/dark/*` to `/*` (opengraph-image paths
+exempted); at `SITE_STAGE=live` the other three themes and the review-only
+sample cards 404. The production branch is `live`; pushes to `main` build
+previews. Going live is: confirm `SITE_STAGE=live` exists on Production in
+Sam's Vercel project, then fast-forward `live` to `main` and push.
 
 ## Scripts
 

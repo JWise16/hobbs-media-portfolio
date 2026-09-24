@@ -6,6 +6,7 @@ import { findAgent } from "@/content/agents";
 import { findProperty } from "@/content/properties";
 import { brand } from "@/content/site";
 import type { ThemeId } from "@/content/themes";
+import { retiredAtLive } from "@/site/routes";
 import { agentParams, propertyParams, routeTitle } from "@/site/routes";
 
 /**
@@ -21,6 +22,7 @@ export function makeHomeRoute(theme: ThemeId) {
     description: brand.description,
   };
   function Page() {
+    if (retiredAtLive(theme)) notFound();
     return <HomePage theme={theme} />;
   }
   return { Page, metadata };
@@ -42,6 +44,7 @@ export function makeAgentRoute(theme: ThemeId) {
     };
   }
   async function Page({ params }: AgentProps) {
+    if (retiredAtLive(theme)) notFound();
     const agent = findAgent((await params).agent);
     if (!agent) notFound();
     return <CallingCard theme={theme} agent={agent} />;
@@ -64,6 +67,7 @@ export function makePropertyRoute(theme: ThemeId) {
     };
   }
   async function Page({ params }: PropertyProps) {
+    if (retiredAtLive(theme)) notFound();
     const property = findProperty((await params).slug);
     if (!property) notFound();
     const agent = property.agent ? findAgent(property.agent) : undefined;
