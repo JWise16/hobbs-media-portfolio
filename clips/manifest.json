@@ -77,9 +77,9 @@
     },
     {
       "id": "yacht-dusk-wake",
-      "source": "yacht-dusk-wake.mov",
-      "in": 23.5,
-      "out": 33.5,
+      "source": "yacht-dusk-wake-v2.mov",
+      "in": 0.2,
+      "out": 9.7,
       "speed": 1,
       "focal": {
         "x": 0.5,

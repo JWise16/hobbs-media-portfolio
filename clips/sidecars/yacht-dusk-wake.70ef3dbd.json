@@ -1,0 +1,30 @@
+{
+  "id": "yacht-dusk-wake",
+  "hash": "70ef3dbd",
+  "sourceHash": "b924788423bff604b170bb7dac3c454287e814752f116aefa6f830d930a9400f",
+  "encoderVersion": "2026-09-22.1",
+  "preset": "medium",
+  "entry": {
+    "id": "yacht-dusk-wake",
+    "source": "yacht-dusk-wake-v2.mov",
+    "in": 0.2,
+    "out": 9.7,
+    "speed": 1,
+    "focal": {
+      "x": 0.5,
+      "y": 0.45
+    },
+    "loop": "xfade",
+    "ratio": "16:9",
+    "hero": false
+  },
+  "duration": 9.009,
+  "files": {
+    "mp4_720": "/clips/yacht-dusk-wake.70ef3dbd.720.mp4",
+    "poster": "/clips/yacht-dusk-wake.70ef3dbd.jpg",
+    "mp4_1080": "/clips/yacht-dusk-wake.70ef3dbd.1080.mp4",
+    "poster_1920": "/clips/yacht-dusk-wake.70ef3dbd.poster.1920.jpg"
+  },
+  "preview": "yacht-dusk-wake.70ef3dbd.preview-916.jpg",
+  "encodedAt": "2026-09-24T21:20:09.677Z"
+}
