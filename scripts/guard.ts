@@ -50,7 +50,7 @@ export async function runGuard(env: GuardEnv = process.env, options: GuardOption
   const stage = resolveStage(env);
   const cwd = options.cwd ?? process.cwd();
 
-  const [{ todos }, site, { agents }, { properties }, { work }, { clips }, plaque, manifestModule] = await Promise.all([
+  const [{ todos }, site, { agents }, { properties }, { work }, { clips }, plaque, manifestModule, { launchTheme }] = await Promise.all([
     import("../content/todo"),
     import("../content/site"),
     import("../content/agents"),
@@ -59,6 +59,7 @@ export async function runGuard(env: GuardEnv = process.env, options: GuardOption
     import("../content/clips.generated"),
     import("../lib/plaque"),
     import("../clips/manifest.json"),
+    import("../content/config"),
   ]);
   const index = clips as Record<string, ClipEntry>;
   const rawManifest = (manifestModule as { default?: unknown }).default ?? manifestModule;
@@ -137,6 +138,7 @@ export async function runGuard(env: GuardEnv = process.env, options: GuardOption
   }
 
   const launch: string[] = [];
+  if (stage === "live" && !launchTheme) launch.push("launchTheme must be set in content/config.ts at SITE_STAGE=live (Sam's chosen theme becomes the bare root)");
   if (stage === "live") {
     const url = env.SITE_URL;
     let parsed = false;

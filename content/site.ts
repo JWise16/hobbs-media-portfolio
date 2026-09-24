@@ -1,5 +1,4 @@
 import type { ClipId } from "./clips.generated";
-import { todo } from "./todo";
 import { serviceOrder, vocabulary, type ServiceKey } from "./vocabulary";
 
 /**
@@ -27,7 +26,7 @@ export const contact = {
   /** E.164 for sms:/tel: links. */
   phoneE164: "+12067904352", // confirmed by Jonny 2026-09-23
   phoneDisplay: "(206) 790-4352",
-  email: todo("contact.email", "hello@hobbsmedia.co"),
+  email: "hobbsmediaco.sea@gmail.com", // confirmed by Sam 2026-09-24
   /** Sam's handle, once he gives one; null hides the Instagram line and link everywhere. */
   instagram: null as string | null,
   basedIn: "Seattle, WA", // approved by Sam 2026-09-23

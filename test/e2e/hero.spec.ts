@@ -96,10 +96,10 @@ test.describe("hero island and playback start", () => {
     await waitForHeroPlaying(page);
     await scrollToFraction(page, 1);
     await page.getByRole("link", { name: /selected work/i }).click();
-    await expect(page).toHaveURL(/\/dark#work$/);
+    await expect(page).toHaveURL(/\/#work$/);
     await expect(page.locator("#work")).toBeVisible();
     await page.goBack();
-    await expect(page).toHaveURL(/\/dark\/for\/jessica$/);
+    await expect(page).toHaveURL(/\/for\/jessica$/);
     await expect(page.locator(".hero-video")).toHaveAttribute("data-hero-init", "1");
     await waitForHeroPlaying(page);
     expect(await page.locator(".hero-video").getAttribute("data-rung")).toBe(isMobile ? "720" : "1080");
