@@ -1,153 +1,119 @@
-# Hobbs Media Co. portfolio
+# Hobbs Media Co. website
 
-Portfolio and calling-card site for Sam (Hobbs Media Co.), a Seattle / Puget
-Sound real estate photo, film, and drone videographer. Next.js App Router,
-TypeScript, Tailwind, Vercel. Design source of truth:
-[`docs/designs/hobbs-media-portfolio.md`](docs/designs/hobbs-media-portfolio.md)
-(the amendment sections override the body). Tokens: [`DESIGN.md`](DESIGN.md).
+This is the code behind **https://hobbsmediaco.com**, Sam's real estate
+photo, film and aerial site. This page is written for Sam. If you are a
+developer, jump to [For developers](#for-developers).
 
-## Review links
+## The short version
 
-During review every route lives under a theme segment. Four links go to Sam:
+- The site is a set of files in this folder (a "repository"). Change the
+  files, and the site changes.
+- You don't edit files by hand. You tell **Claude Code** what you want in
+  plain English, it makes the change, and it shows you a preview link before
+  anything goes public.
+- Nothing you ask for can break the live site by accident. Every change is
+  checked automatically, shown to you on a preview, and only goes public when
+  you say so.
 
-| Theme | Home | Calling card |
+## Who owns what
+
+| Thing | Where it lives | Owner |
 |---|---|---|
-| `dark` (mockup reference) | `/dark` | `/dark/for/jessica`, `/dark/p/ocean-ave` |
-| `light` | `/light` | `/light/for/jessica` |
-| `twilight` | `/twilight` | `/twilight/for/jessica` |
-| `hobbs` (Sam's Lovable design, rebuilt) | `/hobbs` | `/hobbs/for/jessica` |
+| The web address `hobbsmediaco.com` | Namecheap | Sam |
+| The hosting (turns the code into the live site) | Vercel, project `hobbs-media-portfolio` | Sam |
+| The code | GitHub, `JWise16/hobbs-media-portfolio` | Jonny, with Sam as a collaborator |
+| The raw footage | Sam's phone, drone and Drive | Sam (it is never stored in the code) |
 
-All facts on the review links are placeholders until Sam confirms them, and
-the PENDING tag marks clips he has not approved. Do not forward review links
-to agents.
+## What you can change yourself
 
-## Source archive (never committed)
+Three kinds of changes cover almost everything, and Claude Code handles all
+of them:
 
-Sam's raw footage lives in a shared folder Sam owns, mirrored to a local drive:
+1. **Words.** Any text on the site: the headline, the about paragraphs, the
+   contact line, a clip's title. Say what it says now and what it should say.
+2. **Order and set of clips.** Move a clip up or down, remove one, swap which
+   clip is the big one at the top (the "hero").
+3. **New clips.** Upload the video to Google Drive, share it, and give Claude
+   the link. See [Adding a new video](#adding-a-new-video).
 
-- Shared folder: _to be filled in when Sam shares it_
-- Local mirror: set `CLIPS_SOURCE_DIR` in `.env.local` (default `clips/source/`, gitignored)
+Things that are better to send to Jonny: changing colors, fonts or layout;
+anything about how videos play; adding an Instagram line or a stats row for
+the first time; the "calling card" pages for agents.
 
-Sam's first clips (iCloud copies at 1280x720) are in `clips/source/` locally
-and encoded into `public/clips/`. They are unapproved until Sam confirms each
-one. For launch, replace them with the camera originals (4K): the 1080 rung is
-an upscale until then. `clips/placeholders.sh` still generates synthetic
-sources if the pipeline needs exercising without footage.
+## How to make a change, step by step
 
-## Encode workflow (manifest edit to deployed clip in under ten minutes)
+1. Open Claude Code and pick this repository (`JWise16/hobbs-media-portfolio`).
+2. Say what you want. Examples that work well:
+   - "Change the about headline to: Based in Seattle. Part 107. 48 hour turnaround."
+   - "Move Working Water to the top of the recent shoots list."
+   - "Remove The Acropolis from the site."
+   - "Make Golden Hour on the Spit the hero clip."
+   - "Add this video after Under Sail: [Drive link]. Call it Evening Sail,
+     subtitle Aerial film · Lake Union. Use roughly seconds 12 to 22."
+3. Claude makes the change and opens a **pull request**. Think of it as a
+   draft of the site with your change in it. A bot comments on the pull
+   request with a **preview link** a couple of minutes later.
+4. Open the preview link on your phone. It looks and works exactly like the
+   real site, just at a temporary address nobody else knows.
+5. Happy? Tell Claude "looks good, merge it". Not happy? Tell Claude what to
+   fix and check the new preview.
+6. Merging updates the draft site. To make it public, tell Claude
+   **"publish it"**. It pushes the change to the live site, which takes about
+   two minutes.
 
-1. Drop the source file in `CLIPS_SOURCE_DIR`.
-2. Add one entry to `clips/manifest.json`:
+If anything you ask for would break a rule the site enforces (a line too long
+for the header, a clip that doesn't exist), Claude tells you what to change
+instead. The site refuses to build until it's right, so a mistake stays on
+the preview, never on hobbsmediaco.com.
 
-   ```json
-   {
-     "id": "sailboat-orbit",
-     "source": "DJI_0042.MP4",
-     "in": 41.5,
-     "out": 51.0,
-     "speed": 1,
-     "focal": { "x": 0.5, "y": 0.55 },
-     "loop": "xfade",
-     "ratio": "16:9",
-     "hero": true,
-     "approved": false
-   }
-   ```
+## Adding a new video
 
-   `loop`: `xfade` for slow drifts (the 0.5 s overlap is taken from inside
-   `in`..`out`), `pingpong` for one-way moves, `none` to play once. `focal` is
-   the point that must stay in frame when a phone cover-crops the 16:9 encode;
-   it is required for hero clips. Check the crop in
-   `clips/preview/<id>.<hash>.preview-916.jpg` after encoding. If water or a
-   sunset bands, raise that entry's `maxrate` rather than lowering CRF globally.
-3. `npm run encode`. Unchanged clips are skipped (sidecar hash); stale outputs
-   are pruned; `content/clips.generated.ts` is rewritten.
-4. Reference the id from `content/work.ts`, `content/site.ts` (`heroClip`), or
-   `content/properties.ts` (`reel`).
-5. Commit `public/clips/`, `clips/sidecars/`, `clips/manifest.json`, and the
-   generated index. Push. (Sidecars record source paths, so they live outside
-   `public/` and are never served.)
+1. Upload the original file to Google Drive. Best quality is the file
+   straight from the drone or camera, not a copy that went through Photos or
+   iMessage. Big is fine.
+2. Right-click the file, **Share**, set it to **Anyone with the link**, copy
+   the link.
+3. Watch the video once and note:
+   - roughly which seconds you want (for example "from 12 to 22"; 6 to 12
+     seconds of footage is the sweet spot);
+   - a title and a subtitle for the caption (titles up to about 28 characters);
+   - where it goes in the list.
+4. Give Claude the link and those notes. Claude downloads the file, cuts it,
+   encodes it for phones and desktops, makes the still image the site shows
+   before the video plays, and opens a pull request with a preview link.
+5. On the preview, check that the crop looks right on your phone and that the
+   loop point isn't jarring. If the loop looks odd, say so: there are two
+   loop styles (a soft dissolve, and a back-and-forth "boomerang") and Claude
+   can switch, or shift the start and end seconds.
 
-Requires Node 20.12 or newer (`engines` in `package.json`) and ffmpeg and
-ffprobe on PATH (`brew install ffmpeg`). `ENCODE_PRESET` (default `medium`)
-sets the x264 preset; `-- --preset slow` overrides it for one run.
+Every clip you add is treated as approved by you. The site never shows
+footage that wasn't added on purpose.
 
-## Stages and the guard
+## Words you'll see
 
-`SITE_STAGE` must be exactly `review` or `live` (`.env.example`). The prebuild
-guard (`npm run guard`) prints every unconfirmed `todo()` fact and every
-unapproved referenced clip. In review it passes; at `live` it refuses until
-the list is empty. `VERCEL_ENV=production` requires `live`. Plaque and name
-limits (design 17A) fail the build at every stage.
+- **Repository (repo):** the folder of files that is the site.
+- **Pull request (PR):** a proposed change, with its own preview link.
+- **Merge:** accept the proposed change into the main copy.
+- **Preview:** a temporary copy of the site with your change, on a private
+  link. Vercel makes one for every pull request.
+- **Publish / go live:** copy the main version onto hobbsmediaco.com. This is
+  a separate, deliberate step.
+- **Build:** Vercel turning the files into the site. A build can "fail", which
+  just means something was wrong and nothing changed.
 
-At every stage the guard also fails on content integrity problems, listing all
-of them at once: a manifest that fails the schema; a generated index that
-disagrees with the manifest (ids, `approved`, or an edited entry: the guard
-and the encoder hash entries the same way, so a manifest edit without
-`npm run encode` is caught); files named by the index that are missing or
-empty under `public/clips/`; dangling clip or agent references; duplicate or
-malformed slugs. At `live` it additionally requires `SITE_URL` to be an
-absolute https URL (og:image links depend on it) and refuses any unapproved
-clip still in the publication set, even one nothing references.
+## If something looks wrong on the live site
 
-Launch state (2026-09-24): every clip is approved, every `todo()` is
-resolved, `launchTheme` is `dark`, and `SITE_URL` is set on Vercel Production.
-With a launch theme set, next.config serves the bare root from `/dark`
-(fallback rewrite) and 301s `/dark/*` to `/*` (opengraph-image paths
-exempted); at `SITE_STAGE=live` the other three themes and the review-only
-sample cards 404. The production branch is `live`; pushes to `main` build
-previews. Going live is: confirm `SITE_STAGE=live` exists on Production in
-Sam's Vercel project, then fast-forward `live` to `main` and push.
+Tell Claude "the live site shows X, it should show Y" and it will find the
+last change and fix or undo it. The site keeps every previous version, so
+going back is always possible. If you can't reach Claude, text Jonny.
 
-## Scripts
+---
 
-| Command | What |
-|---|---|
-| `npm run dev` | Next dev server |
-| `npm run build` | guard, then `next build` |
-| `npm run start` | serve the last build (`next start`) |
-| `npm run encode` | footage pipeline (`-- --dry-run`, `-- --force`, `-- --preset <x264 preset>`, `-- --manifest <file>`, `-- --out <dir>`) |
-| `npm run guard` | placeholder, approval and integrity report |
-| `npm test` / `npm run test:unit` | Vitest units (encode runs on a 2 s ffmpeg fixture, so ffmpeg is required here too) |
-| `npm run test:e2e` | Playwright: iPhone 14 WebKit + desktop Google Chrome (`channel: "chrome"`, for H.264), plus reduced-motion variants, against `next start` of the last `npm run build` (port 3210, `PW_PORT` overrides) |
-| `PREVIEW_URL=https://… npm run test:e2e -- preview-public` | logged-out check against a deployed preview |
-| `npm run typecheck` | `tsc --noEmit` |
-| `npm run lint` | `eslint .` |
+## For developers
 
-Playwright browsers: `npx playwright install webkit`; the desktop project uses the installed Google Chrome (Playwright's open-source Chromium has no H.264). Run `npm run build` before `npm run test:e2e`; the Playwright web server only starts `next start`, it does not build.
-
-Scripts run with `tsx`, which does not load `.env*` by itself. `scripts/guard.ts` loads env through `@next/env`, the same files in the same order as `next build` (`.env.production.local`, `.env.local`, `.env`, …), so it judges the same `SITE_STAGE` the build renders. `scripts/encode.ts` uses the small loader in `scripts/env.ts` (`.env.local` then `.env`). In both, a variable already set in the shell wins.
-
-## Acceptance targets (real-phone check at the four-link milestone)
-
-- First hero frame under 1.5 s on LTE; under 4 MB transferred before the reel plays.
-- Lighthouse mobile performance ≥ 90 on `/dark` against the preview URL.
-- Selected work plays one clip at a time with no blank frames on an iPhone.
-- Low Power Mode: poster plus TAP TO PLAY, nothing errors (manual).
-- `/dark/for/jessica` pasted into iMessage shows the poster, the wordmark, and the name.
-
-Record the numbers in `docs/designs/hobbs-media-portfolio.md` (T12).
-
-## Layout
-
-- `app/<theme>/` — one explicit route tree per theme: `page.tsx`, `for/[agent]/page.tsx`, `p/[slug]/page.tsx`, each with an `opengraph-image.tsx`. Every file is a few lines binding the theme to the factories in `site/page.tsx` and `site/og.tsx`; params are static and unknown slugs are 404s. The segment is not dynamic because Next.js does not allow OG images under an optional catch-all.
-- `content/` — every fact and list the site renders (`site.ts`, `work.ts`, `agents.ts`, `properties.ts`, `config.ts`, `todo.ts`) and the generated clip index `clips.generated.ts`. Never edit the index by hand; run `npm run encode`.
-- `components/` — sections, calling card, plaque, header; `components/hero/HeroIsland.tsx` is the raw-HTML hero island.
-- `lib/` — `VideoBudget.ts` (one decoder at a time), `playbackPolicy.ts`, `heroIsland.ts`, `scrollDim.ts`, `plaque.ts` (17A limits), `stage.ts`, `href.ts`.
-- `clips/` — `manifest.json`, `manifest.schema.ts`, `placeholders.sh`, encode sidecars in `clips/sidecars/` (committed); `source/` and `preview/` are gitignored.
-- `scripts/` — `encode.ts`, `guard.ts`, `env.ts` (dotenv for the encoder), `isMain.ts`.
-- `styles/tokens.css` — the `DESIGN.md` token sheet as CSS variables per theme; `fonts/` — self-hosted faces, two families per theme.
-- `test/unit/` (Vitest, `vitest.config.ts`) and `test/e2e/` (Playwright, `playwright.config.ts`).
-
-## Test map
-
-The failure-modes table and the VideoBudget state diagram in the design doc
-map onto `test/unit/*` and `test/e2e/*`; see [`docs/test-map.md`](docs/test-map.md).
-The eng-review test plan that the map was built from is
-[`docs/designs/test-plan.md`](docs/designs/test-plan.md).
-
-## Other docs
-
-- [`CHANGELOG.md`](CHANGELOG.md) — release notes; versions are `MAJOR.MINOR.PATCH.MICRO` (`VERSION`).
-- [`TODOS.md`](TODOS.md) — deferred work with effort, priority and dependencies.
-- [`CLAUDE.md`](CLAUDE.md) — working rules for coding agents.
+The technical reference, including the footage pipeline, the build guard,
+scripts, layout and tests, is in [`docs/developing.md`](docs/developing.md).
+Working rules for coding agents are in [`CLAUDE.md`](CLAUDE.md). The design
+source of truth is
+[`docs/designs/hobbs-media-portfolio.md`](docs/designs/hobbs-media-portfolio.md)
+with the token sheet in [`DESIGN.md`](DESIGN.md).
