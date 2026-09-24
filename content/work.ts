@@ -5,8 +5,7 @@ import type { ServiceKey } from "./vocabulary";
  * Selected work, in Sam's layout: serif title, tracked subtitle, outlined tag.
  * Clip entries reference the manifest by id; photography entries use `image`
  * (public/work/*) and render as a static frame. No photos exist yet.
- * Order is Sam's (2026-09-23, his numbered export: 1, 2, 2, 3, 4, 5, 8; the
- * files numbered 6 and 7 never arrived). Titles are placeholders until Sam
+ * Order is Sam's (set 2026-09-24). Titles are placeholders until Sam
  * names the shoots. Titles and subtitles approved by Sam 2026-09-23.
  */
 export type WorkMedia = { clip: ClipId } | { image: string; alt: string };
@@ -28,13 +27,6 @@ export const work: WorkItem[] = [
     media: { clip: "sailboat-sunset" },
   },
   {
-    slug: "spit-golden-hour",
-    title: "Golden Hour on the Spit",
-    subtitle: "Aerial film · Discovery Park",
-    tag: "drone",
-    media: { clip: "spit-golden-hour" },
-  },
-  {
     slug: "athens-acropolis",
     title: "The Acropolis",
     subtitle: "Aerial film · Athens",
@@ -47,6 +39,13 @@ export const work: WorkItem[] = [
     subtitle: "Aerial film · Seattle",
     tag: "drone",
     media: { clip: "city-rise" },
+  },
+  {
+    slug: "spit-golden-hour",
+    title: "Golden Hour on the Spit",
+    subtitle: "Aerial film · Discovery Park",
+    tag: "drone",
+    media: { clip: "spit-golden-hour" },
   },
   {
     slug: "yacht-dusk-wake",

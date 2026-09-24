@@ -105,22 +105,22 @@ export const clips = {
   },
   "yacht-dusk-wake": {
       "id": "yacht-dusk-wake",
-      "hash": "6222c0c5",
-      "entryHash": "ca0ad851",
+      "hash": "70ef3dbd",
+      "entryHash": "294c9fb0",
       "ratio": "16:9",
       "focal": {
           "x": 0.5,
           "y": 0.45
       },
       "loop": "xfade",
-      "duration": 9.509,
+      "duration": 9.009,
       "approved": true,
       "hero": false,
       "files": {
-          "mp4_720": "/clips/yacht-dusk-wake.6222c0c5.720.mp4",
-          "mp4_1080": "/clips/yacht-dusk-wake.6222c0c5.1080.mp4",
-          "poster": "/clips/yacht-dusk-wake.6222c0c5.jpg",
-          "poster_1920": "/clips/yacht-dusk-wake.6222c0c5.poster.1920.jpg"
+          "mp4_720": "/clips/yacht-dusk-wake.70ef3dbd.720.mp4",
+          "poster": "/clips/yacht-dusk-wake.70ef3dbd.jpg",
+          "mp4_1080": "/clips/yacht-dusk-wake.70ef3dbd.1080.mp4",
+          "poster_1920": "/clips/yacht-dusk-wake.70ef3dbd.poster.1920.jpg"
       }
   },
   "hilltop-tower": {
