@@ -22,7 +22,10 @@ with is Sam (or anyone who isn't asking in developer terms), follow these:
 - Merging to `main` does not publish. Production is the `live` branch.
   Publish only when Sam explicitly asks ("publish", "go live", "put it on the
   site"): `git push origin main:live`, then confirm https://hobbsmediaco.com
-  shows the change. Never publish on your own initiative.
+  shows the change. If you cannot push branches directly (a cloud sandbox
+  that only opens pull requests), open a pull request from `main` into `live`
+  titled "Publish" and tell Sam to merge it on GitHub; the merge is the
+  publish. Never publish on your own initiative.
 - Run `npm run guard` and `npm test` before opening the pull request. If the
   guard refuses something (a line over its limit, a missing clip), explain the
   limit in one sentence and offer the nearest thing that fits.
