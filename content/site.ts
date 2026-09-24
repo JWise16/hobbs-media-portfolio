@@ -28,9 +28,10 @@ export const contact = {
   phoneE164: "+12067904352", // confirmed by Jonny 2026-09-23
   phoneDisplay: "(206) 790-4352",
   email: todo("contact.email", "hello@hobbsmedia.co"),
-  instagram: todo("contact.instagram", "hobbsmedia.co"),
-  basedIn: todo("contact.basedIn", "Seattle, WA"),
-  serving: todo("contact.serving", "Puget Sound & beyond"),
+  /** Sam's handle, once he gives one; null hides the Instagram line and link everywhere. */
+  instagram: null as string | null,
+  basedIn: "Seattle, WA", // approved by Sam 2026-09-23
+  serving: "Puget Sound & beyond",
   /** Hours render only if Sam confirms them; null hides the row. */
   hours: null as string | null,
 } as const;
@@ -39,7 +40,7 @@ export const contactLinks = {
   sms: () => `sms:${contact.phoneE164}`,
   tel: () => `tel:${contact.phoneE164}`,
   mailto: () => `mailto:${contact.email}`,
-  instagram: () => `https://instagram.com/${contact.instagram}`,
+  instagram: () => (contact.instagram ? `https://instagram.com/${contact.instagram}` : null),
 };
 
 /**
@@ -49,8 +50,8 @@ export const contactLinks = {
  */
 export const homePlaque: readonly [string, string, string] = [
   "REAL ESTATE PHOTO·FILM·AERIAL",
-  todo("plaque.area", "SEATTLE & PUGET SOUND"),
-  todo("plaque.part107", "FAA PART 107 CERTIFIED"),
+  "SEATTLE & PUGET SOUND", // approved by Sam 2026-09-23
+  "FAA PART 107 CERTIFIED",
 ];
 
 export interface Service {
@@ -62,53 +63,45 @@ export interface Service {
 export const services: Service[] = serviceOrder.map((key) => ({
   key,
   title: vocabulary[key].long,
-  description: todo(
-    `services.${key}.description`,
-    {
-      photography: "Thoughtful, high-end imagery that shows a property at its best.",
-      videography: "Cinematic films that capture feeling, flow and the finer details.",
-      drone: "Elevated perspectives that reveal location, scale and context.",
-    }[key],
-  ),
+  // Approved by Sam 2026-09-23.
+  description: {
+    photography: "Thoughtful, high-end imagery that shows a property at its best.",
+    videography: "Cinematic films that capture feeling, flow and the finer details.",
+    drone: "Elevated perspectives that reveal location, scale and context.",
+  }[key],
 }));
 
 /** Headlines carry facts; the hero owns the mood (design 9A). At most one mood line per page. */
 export const copy = {
   whatIDo: {
     kicker: "What I do",
-    headline: todo("copy.whatIDo.headline", "Photography, property films and aerials."),
+    headline: "Photography, property films and aerials.",
   },
   work: {
     kicker: "Selected work",
     headline: "Recent shoots.",
     /** "AERIAL WORK, PUGET SOUND" until property films land, then "SELECTED PROPERTY SHOOTS". */
-    subline: todo("copy.work.subline", "AERIAL WORK, PUGET SOUND"),
+    subline: "AERIAL WORK, PUGET SOUND",
   },
   about: {
     kicker: "About",
-    headline: todo("copy.about.headline", "Based in Seattle. Part 107. 24 to 48 hour turnaround."),
+    headline: "Based in Seattle. Part 107. 24 to 48 hour turnaround.",
     paragraphs: [
-      todo(
-        "copy.about.p1",
-        "Hobbs Media Co. is a one-person studio built around a simple idea: great media sells homes faster and for more. Every shoot is planned, shot and edited by me. No handoffs, no filler.",
-      ),
-      todo(
-        "copy.about.p2",
-        "I work with agents, builders and property owners across the region. Turnaround is 24 to 48 hours for photography, 3 to 5 days for full video.",
-      ),
+      "Hobbs Media Co. is a one-person studio built around a simple idea: great media sells homes faster and for more. Every shoot is planned, shot and edited by me. No handoffs, no filler.",
+      "I work with agents, builders and property owners across the region. Turnaround is 24 to 48 hours for photography, 3 to 5 days for full video.",
     ],
   },
   contact: {
     kicker: "Get in touch",
     headline: "Have a listing coming up?",
-    sentence: todo("copy.contact.sentence", "Send the address and target list date. I reply the same day with availability and a quote."),
+    sentence: "Send the address and target list date. I reply the same day with availability and a quote.",
     textSam: `Text ${brand.firstName}`,
     emailSam: `Email ${brand.firstName}`,
     facts: { basedIn: "Based in", serving: "Serving", instagram: "Instagram", hours: "Hours" },
   },
   hobbsHero: {
-    kicker: todo("copy.hobbsHero.kicker", "Real estate media · Est. 2021"),
-    headline: todo("copy.hobbsHero.headline", "Photography, property films and aerials for Seattle listings."),
+    kicker: "Real estate media · Seattle",
+    headline: "Photography, property films and aerials for Seattle listings.",
     /** Sam's mood line from his Lovable site, moved to the subhead (9A). */
     mood: "Listings that move. Stories told in light.",
     viewWork: "View the work",
@@ -132,10 +125,10 @@ export interface Stat {
   confirmed: boolean;
 }
 
-export const stats: Stat[] = [
-  { value: todo("stats.homes", "400+"), label: "Homes shot", confirmed: false },
-  { value: todo("stats.delivery", "36h"), label: "Avg. delivery", confirmed: false },
-  { value: todo("stats.part107", "Certified"), label: "FAA Part 107", confirmed: false },
-];
+/**
+ * Empty until Sam supplies real numbers (homes shot, average delivery, Part
+ * 107). The row renders only with three confirmed stats; no invented figures.
+ */
+export const stats: Stat[] = [];
 
-export const statsConfirmed = stats.every((s) => s.confirmed);
+export const statsConfirmed = stats.length === 3 && stats.every((s) => s.confirmed);

@@ -14,15 +14,18 @@ export function Contact({ theme }: { theme: ThemeId }) {
   const facts: Array<{ label: string; value: React.ReactNode }> = [
     { label: labels.basedIn, value: contact.basedIn },
     { label: labels.serving, value: contact.serving },
-    {
+  ];
+  const instagram = contactLinks.instagram();
+  if (instagram) {
+    facts.push({
       label: labels.instagram,
       value: (
-        <a href={contactLinks.instagram()} className="tap fact-link" rel="noopener">
+        <a href={instagram} className="tap fact-link" rel="noopener">
           @{contact.instagram}
         </a>
       ),
-    },
-  ];
+    });
+  }
   if (contact.hours) facts.push({ label: labels.hours, value: contact.hours });
 
   return (

@@ -1,3 +1,4 @@
+import { isReview } from "../lib/stage";
 import { todo } from "./todo";
 
 /**
@@ -11,13 +12,16 @@ export interface Agent {
   brokerage?: string;
 }
 
-export const agents: Agent[] = [
-  {
-    slug: "jessica",
-    displayName: todo("agents.jessica.displayName", "Jessica Tran"),
-    brokerage: todo("agents.jessica.brokerage", "Windermere"),
-  },
-];
+/** The sample card exists on the review links only; live has no agents until Sam names one. */
+export const agents: Agent[] = isReview()
+  ? [
+      {
+        slug: "jessica",
+        displayName: todo("agents.jessica.displayName", "Jessica Tran"),
+        brokerage: todo("agents.jessica.brokerage", "Windermere"),
+      },
+    ]
+  : [];
 
 export function findAgent(slug: string): Agent | undefined {
   return agents.find((a) => a.slug === slug);

@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { contact as siteContact } from "../../content/site";
 import { work } from "../../content/work";
 import { allThemes } from "./helpers";
 
@@ -59,7 +60,8 @@ test.describe("routes, metadata, caching", () => {
     await expect(contact.getByRole("link", { name: /text sam/i })).toHaveAttribute("href", /^sms:\+1\d{10}$/);
     await expect(contact.getByRole("link", { name: /email sam/i })).toHaveAttribute("href", /^mailto:.+@.+/);
     await expect(contact.locator("a[href^='tel:']")).toHaveCount(1);
-    await expect(contact.locator("a[href^='https://instagram.com/']")).toHaveCount(1);
+    // The Instagram line exists only once Sam supplies a handle.
+    await expect(contact.locator("a[href^='https://instagram.com/']")).toHaveCount(siteContact.instagram ? 1 : 0);
   });
 
   test("calling card: personalized plaque with a tel: line, beat two reveals contact and one link to the work", async ({ page }) => {

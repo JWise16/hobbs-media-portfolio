@@ -14,12 +14,12 @@ export const clips = {
       },
       "loop": "pingpong",
       "duration": 14.114,
-      "approved": false,
+      "approved": true,
       "hero": true,
       "files": {
           "mp4_720": "/clips/needle-above-clouds.a43ccff7.720.mp4",
-          "poster": "/clips/needle-above-clouds.a43ccff7.jpg",
           "mp4_1080": "/clips/needle-above-clouds.a43ccff7.1080.mp4",
+          "poster": "/clips/needle-above-clouds.a43ccff7.jpg",
           "poster_1920": "/clips/needle-above-clouds.a43ccff7.poster.1920.jpg"
       }
   },
@@ -34,7 +34,7 @@ export const clips = {
       },
       "loop": "pingpong",
       "duration": 10.711,
-      "approved": false,
+      "approved": true,
       "hero": false,
       "files": {
           "mp4_720": "/clips/sailboat-sunset.e9491097.720.mp4",
@@ -54,7 +54,7 @@ export const clips = {
       },
       "loop": "xfade",
       "duration": 9.509,
-      "approved": false,
+      "approved": true,
       "hero": false,
       "files": {
           "mp4_720": "/clips/spit-golden-hour.ce507f35.720.mp4",
@@ -74,7 +74,7 @@ export const clips = {
       },
       "loop": "pingpong",
       "duration": 17.918,
-      "approved": false,
+      "approved": true,
       "hero": false,
       "files": {
           "mp4_720": "/clips/athens-acropolis.c557b3e3.720.mp4",
@@ -94,7 +94,7 @@ export const clips = {
       },
       "loop": "pingpong",
       "duration": 8.709,
-      "approved": false,
+      "approved": true,
       "hero": false,
       "files": {
           "mp4_720": "/clips/city-rise.adb3e78e.720.mp4",
@@ -114,7 +114,7 @@ export const clips = {
       },
       "loop": "xfade",
       "duration": 9.509,
-      "approved": false,
+      "approved": true,
       "hero": false,
       "files": {
           "mp4_720": "/clips/yacht-dusk-wake.6222c0c5.720.mp4",
@@ -134,7 +134,7 @@ export const clips = {
       },
       "loop": "xfade",
       "duration": 9.509,
-      "approved": false,
+      "approved": true,
       "hero": false,
       "files": {
           "mp4_720": "/clips/hilltop-tower.0969bd6e.720.mp4",
@@ -154,7 +154,7 @@ export const clips = {
       },
       "loop": "xfade",
       "duration": 7.508,
-      "approved": false,
+      "approved": true,
       "hero": false,
       "files": {
           "mp4_720": "/clips/tug-daylight.a691afa4.720.mp4",

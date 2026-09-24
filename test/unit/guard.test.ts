@@ -23,9 +23,9 @@ describe("guard report (T6, T2, 17A)", () => {
   it("review: passes and lists every placeholder and unapproved clip", async () => {
     const r = await runGuard({ SITE_STAGE: "review" });
     expect(r.ok).toBe(true);
-    expect(r.todos.length).toBeGreaterThan(10);
+    expect(r.todos.length).toBeGreaterThan(0);
     expect(r.todos.map((t) => t.label)).toContain("contact.email");
-    expect(r.unapprovedClips).toContain("sailboat-sunset");
+    expect(r.unapprovedClips).toEqual([]);
     expect(r.limitViolations).toEqual([]);
     expect(r.plaqueLimitViolations).toEqual([]);
     expect(r.lines.join("\n")).toContain("OK for review");
@@ -37,8 +37,7 @@ describe("guard report (T6, T2, 17A)", () => {
     const text = r.lines.join("\n");
     expect(text).toContain("FAIL: SITE_STAGE=live refuses");
     expect(text).toContain("contact.email");
-    expect(text).toContain("stats.homes");
-    expect(text).toContain("sailboat-sunset");
+    expect(text).toContain("Unconfirmed facts (");
   });
 
   it("live also requires an absolute SITE_URL for og:image links", async () => {
