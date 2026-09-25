@@ -5,8 +5,8 @@ import { themes, type ThemeId } from "@/content/themes";
 /**
  * Get in touch (mockup H; design 4A, 5A, 7A). Opaque theme surface (hobbs:
  * Sam's dark contact surface via the --contact-* tokens). Filled TEXT SAM,
- * outlined EMAIL SAM, phone as a tel: link and email as text on every
- * surface, then the facts. Hours render only when confirmed. No form.
+ * EMAIL SAM and the email as a mailto: link on every surface (no phone
+ * number, Sam's request), then the facts. Hours render only when confirmed. No form.
  */
 export function Contact({ theme }: { theme: ThemeId }) {
   const t = themes[theme];

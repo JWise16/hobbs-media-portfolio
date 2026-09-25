@@ -13,8 +13,8 @@ export function NotFound({ theme }: { theme: ThemeId }) {
         {copy.notFound.headline}
       </h1>
       <div className="flex flex-col gap-3 w-full max-w-[420px] items-center">
-        <a className="btn btn-primary" href={contactLinks.sms()}>
-          {copy.contact.textSam}
+        <a className="btn btn-primary" href={contactLinks.mailto()}>
+          {copy.contact.emailSam}
         </a>
         <Link className="tracked tap px-2 body-muted" href={homeHref(theme)}>
           {copy.notFound.home}

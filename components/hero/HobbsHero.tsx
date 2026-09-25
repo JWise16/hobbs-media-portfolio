@@ -23,7 +23,7 @@ export function HobbsHero({ theme, clip }: { theme: ThemeId; clip: ClipEntry }) 
           <a className="btn btn-primary" href={workHref(theme)}>
             {copy.hobbsHero.viewWork} →
           </a>
-          <a className="btn btn-secondary" href={contactLinks.sms()}>
+          <a className="btn btn-secondary" href={contactLinks.mailto()}>
             {copy.hobbsHero.requestQuote}
           </a>
         </div>

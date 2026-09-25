@@ -1,18 +1,16 @@
 import { contact, contactLinks, copy } from "@/content/site";
 
 /**
- * TEXT SAM (filled) and EMAIL SAM (outlined) plus the phone as a tel: link
- * and the email as text. Shared by the contact section and the calling card
- * so the hrefs, labels and analytics hooks have one owner.
+ * EMAIL SAM (filled) plus the email as text, and the Instagram handle when
+ * there is one. Shared by the contact section and the calling card so the
+ * hrefs, labels and analytics hooks have one owner. There is no phone number
+ * anywhere on the site (Sam's request, 2026-09-24).
  */
 export function ContactActions({ variant }: { variant: "section" | "card" }) {
   const cls = variant === "section" ? "contact-buttons" : "beat-two-buttons";
   return (
     <div className={cls}>
-      <a className="btn btn-primary" href={contactLinks.sms()} data-event="text-sam">
-        {copy.contact.textSam}
-      </a>
-      <a className="btn btn-secondary" href={contactLinks.mailto()} data-event="email-sam">
+      <a className="btn btn-primary" href={contactLinks.mailto()} data-event="email-sam">
         {copy.contact.emailSam}
       </a>
     </div>
@@ -20,14 +18,13 @@ export function ContactActions({ variant }: { variant: "section" | "card" }) {
 }
 
 export function ContactLines({ variant }: { variant: "section" | "card" }) {
+  const instagram = contactLinks.instagram();
   if (variant === "card") {
-    const instagram = contactLinks.instagram();
     return (
       <p className="beat-two-details body-muted">
-        <a href={contactLinks.tel()} className="tap tabular">
-          {contact.phoneDisplay}
+        <a href={contactLinks.mailto()} className="tap">
+          {contact.email}
         </a>
-        <span>{contact.email}</span>
         {instagram ? (
           <a href={instagram} className="tap" rel="noopener">
             @{contact.instagram}
@@ -38,10 +35,9 @@ export function ContactLines({ variant }: { variant: "section" | "card" }) {
   }
   return (
     <p className="contact-lines">
-      <a href={contactLinks.tel()} className="tap tabular contact-phone">
-        {contact.phoneDisplay}
+      <a href={contactLinks.mailto()} className="tap contact-email">
+        {contact.email}
       </a>
-      <span className="contact-email">{contact.email}</span>
     </p>
   );
 }

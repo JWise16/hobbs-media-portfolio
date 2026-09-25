@@ -21,16 +21,16 @@ export interface CallingCardProps {
 /**
  * The two-beat calling card (/for/[agent], /p/[slug]; mockups I and C;
  * design 2A, 7A, 17A). Beat one: the reel with a personalized plaque whose
- * third line is the phone as a tel: link. Scroll dims the reel to 0.86 in the
+ * third line is the email as a mailto: link. Scroll dims the reel to 0.86 in the
  * theme surface; beat two ghosts over it: kicker PREPARED FOR, serif name
- * line, TEXT SAM / EMAIL SAM, details, one quiet link to the work. Share
+ * line, EMAIL SAM, details, one quiet link to the work. Share
  * links always render the cinematic hero regardless of theme.
  */
 export function CallingCard({ theme, agent, property }: CallingCardProps) {
   const clip = clips[property?.reel ?? heroClip];
   const plaque = property
-    ? propertyPlaque(property, agent, contact.phoneDisplay, contact.phoneE164)
-    : agentPlaque(agent!, contact.phoneDisplay, contact.phoneE164);
+    ? propertyPlaque(property, agent, contact.email)
+    : agentPlaque(agent!, contact.email);
   const title = property ? property.title : `${brand.name} for ${agent!.displayName}`;
   const name = agent ? nameLine(agent) : property!.title;
 

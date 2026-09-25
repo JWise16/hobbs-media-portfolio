@@ -48,8 +48,8 @@ export function Header({ theme, mode }: { theme: ThemeId; mode?: "on-progress" |
     <header className="site-header" data-mode={m} data-visible={visible ? "1" : "0"} data-past-hero={pastHero ? "1" : "0"} inert={!visible}>
       <div className="site-header-inner">
         <Wordmark theme={theme} size="header" />
-        <a className="tracked tap site-header-link" href={contactLinks.sms()}>
-          {copy.contact.textSam}
+        <a className="tracked tap site-header-link" href={contactLinks.mailto()}>
+          {copy.contact.emailSam}
         </a>
       </div>
     </header>

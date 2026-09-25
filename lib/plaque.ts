@@ -5,8 +5,11 @@ import type { Property } from "@/content/properties";
  * Plaque composition and limits (design 17A, 10A).
  *
  *   home:  REAL ESTATE PHOTO · FILM · AERIAL / SEATTLE & PUGET SOUND / FAA PART 107 CERTIFIED
- *   /for/: PREPARED FOR {DISPLAYNAME} / {BROKERAGE} / {PHONE}
- *   /p/:   {PROPERTY TITLE} / PREPARED FOR {DISPLAYNAME} / {PHONE}
+ *   /for/: PREPARED FOR {DISPLAYNAME} / {BROKERAGE} / {EMAIL}
+ *   /p/:   {PROPERTY TITLE} / PREPARED FOR {DISPLAYNAME} / {EMAIL}
+ *
+ * The third line was the phone; Sam asked that his number never appear on the
+ * site (2026-09-24), so it is the email as a mailto: link.
  *
  * Any composed line is at most 32 characters. Over-limit fails the build
  * naming the string (scripts/guard.ts).
@@ -22,8 +25,8 @@ export const LIMITS = {
 
 export interface PlaqueLine {
   text: string;
-  /** Rendered as a tel: link with a 44px tap height (2A). */
-  tel?: string;
+  /** Rendered as a link (mailto:) with a 44px tap height (2A). */
+  href?: string;
 }
 
 export type Plaque = readonly [PlaqueLine, PlaqueLine, PlaqueLine];
@@ -32,19 +35,19 @@ export function homePlaqueLines(lines: readonly [string, string, string]): Plaqu
   return [{ text: lines[0] }, { text: lines[1] }, { text: lines[2] }];
 }
 
-export function agentPlaque(agent: Agent, phoneDisplay: string, phoneE164: string): Plaque {
+export function agentPlaque(agent: Agent, email: string): Plaque {
   return [
     { text: `PREPARED FOR ${agent.displayName.toUpperCase()}` },
     { text: (agent.brokerage ?? "").toUpperCase() },
-    { text: phoneDisplay, tel: `tel:${phoneE164}` },
+    { text: email, href: `mailto:${email}` },
   ];
 }
 
-export function propertyPlaque(property: Property, agent: Agent | undefined, phoneDisplay: string, phoneE164: string): Plaque {
+export function propertyPlaque(property: Property, agent: Agent | undefined, email: string): Plaque {
   return [
     { text: property.title.toUpperCase() },
     { text: agent ? `PREPARED FOR ${agent.displayName.toUpperCase()}` : "" },
-    { text: phoneDisplay, tel: `tel:${phoneE164}` },
+    { text: email, href: `mailto:${email}` },
   ];
 }
 

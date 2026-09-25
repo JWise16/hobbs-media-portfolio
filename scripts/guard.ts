@@ -154,15 +154,14 @@ export async function runGuard(env: GuardEnv = process.env, options: GuardOption
 
   const plaqueLimitViolations = [
     ...plaque.checkPlaqueLimits("home plaque", plaque.homePlaqueLines(site.homePlaque)),
-    ...agents.flatMap((a) => plaque.checkPlaqueLimits(`/for/${a.slug} plaque`, plaque.agentPlaque(a, site.contact.phoneDisplay, site.contact.phoneE164))),
+    ...agents.flatMap((a) => plaque.checkPlaqueLimits(`/for/${a.slug} plaque`, plaque.agentPlaque(a, site.contact.email))),
     ...properties.flatMap((p) =>
       plaque.checkPlaqueLimits(
         `/p/${p.slug} plaque`,
         plaque.propertyPlaque(
           p,
           agents.find((a) => a.slug === p.agent),
-          site.contact.phoneDisplay,
-          site.contact.phoneE164,
+          site.contact.email,
         ),
       ),
     ),
