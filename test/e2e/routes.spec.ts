@@ -20,7 +20,7 @@ test.describe("routes, metadata, caching", () => {
     }
     await page.goto("/for/nobody");
     await expect(page.getByRole("heading", { name: "That link isn't live." })).toBeVisible();
-    await expect(page.getByRole("link", { name: /text sam/i })).toHaveAttribute("href", /^sms:/);
+    await expect(page.getByRole("link", { name: /email sam/i }).first()).toHaveAttribute("href", /^mailto:/);
     await expect(page.locator("main a.tracked[href='/']")).toHaveText(/hobbs media co\. home/i);
   });
 
@@ -58,22 +58,23 @@ test.describe("routes, metadata, caching", () => {
     expect(res.headers()["cache-control"]).toContain("immutable");
   });
 
-  test("contact links: sms:, mailto:, tel:, instagram", async ({ page }) => {
+  test("contact links: mailto only (no phone anywhere), instagram when set", async ({ page }) => {
     await page.goto("/dark");
     const contact = page.locator("#contact");
-    await expect(contact.getByRole("link", { name: /text sam/i })).toHaveAttribute("href", /^sms:\+1\d{10}$/);
     await expect(contact.getByRole("link", { name: /email sam/i })).toHaveAttribute("href", /^mailto:.+@.+/);
-    await expect(contact.locator("a[href^='tel:']")).toHaveCount(1);
+    expect(await page.locator("a[href^='tel:'], a[href^='sms:']").count()).toBe(0);
+    expect(await page.content()).not.toMatch(/\(\d{3}\) \d{3}-\d{4}/);
     // The Instagram line exists only once Sam supplies a handle.
     await expect(contact.locator("a[href^='https://instagram.com/']")).toHaveCount(siteContact.instagram ? 1 : 0);
   });
 
-  test("calling card: personalized plaque with a tel: line, beat two reveals contact and one link to the work", async ({ page }) => {
+  test("calling card: personalized plaque with a mailto: line, beat two reveals contact and one link to the work", async ({ page }) => {
     await page.goto("/dark/for/jessica");
     const plaque = page.locator(".hero-plaque");
     await expect(plaque).toContainText("PREPARED FOR JESSICA TRAN");
     await expect(plaque).toContainText("WINDERMERE");
-    await expect(plaque.locator("a[href^='tel:']")).toHaveCount(1);
+    await expect(plaque.locator("a[href^='mailto:']")).toHaveCount(1);
+    expect(await page.locator("a[href^='tel:'], a[href^='sms:']").count()).toBe(0);
     await expect(page.getByRole("heading", { level: 2, name: "Jessica Tran · Windermere" })).toBeVisible();
     // One h1 per page: the wordmark in the hero.
     expect(await page.locator("h1").count()).toBe(1);

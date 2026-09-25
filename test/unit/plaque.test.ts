@@ -5,28 +5,28 @@ const jessica = { slug: "jessica", displayName: "Jessica Tran", brokerage: "Wind
 const ocean = { slug: "ocean-ave", title: "1234 Ocean Ave", subtitle: "Aerial film", agent: "jessica" };
 
 describe("plaque composition (17A)", () => {
-  it("/for/: PREPARED FOR {NAME} / {BROKERAGE} / {PHONE} as tel:", () => {
-    const p = agentPlaque(jessica, "(206) 555-0142", "+12065550142");
+  it("/for/: PREPARED FOR {NAME} / {BROKERAGE} / {EMAIL} as mailto:", () => {
+    const p = agentPlaque(jessica, "sam@example.com");
     expect(p[0].text).toBe("PREPARED FOR JESSICA TRAN");
     expect(p[1].text).toBe("WINDERMERE");
-    expect(p[2]).toEqual({ text: "(206) 555-0142", tel: "tel:+12065550142" });
+    expect(p[2]).toEqual({ text: "sam@example.com", href: "mailto:sam@example.com" });
   });
 
-  it("/p/: {TITLE} / PREPARED FOR {NAME} / {PHONE}", () => {
-    const p = propertyPlaque(ocean, jessica, "(206) 555-0142", "+12065550142");
+  it("/p/: {TITLE} / PREPARED FOR {NAME} / {EMAIL}", () => {
+    const p = propertyPlaque(ocean, jessica, "sam@example.com");
     expect(p[0].text).toBe("1234 OCEAN AVE");
     expect(p[1].text).toBe("PREPARED FOR JESSICA TRAN");
-    expect(p[2].tel).toBe("tel:+12065550142");
+    expect(p[2].href).toBe("mailto:sam@example.com");
   });
 
   it("/p/ without an agent leaves line two empty", () => {
-    expect(propertyPlaque(ocean, undefined, "x", "+1")[1].text).toBe("");
+    expect(propertyPlaque(ocean, undefined, "x@y.z")[1].text).toBe("");
   });
 
   it("home plaque lines pass through", () => {
     const p = homePlaqueLines(["A", "B", "C"]);
     expect(p.map((l) => l.text)).toEqual(["A", "B", "C"]);
-    expect(p.every((l) => !l.tel)).toBe(true);
+    expect(p.every((l) => !l.href)).toBe(true);
   });
 
   it("beat-two name line has no dangling dot", () => {
@@ -52,9 +52,9 @@ describe("guard limits (17A)", () => {
   });
 
   it("composed plaque line ≤ 32", () => {
-    const ok = agentPlaque(jessica, "(206) 555-0142", "+1");
+    const ok = agentPlaque(jessica, "sam@example.com");
     expect(checkPlaqueLimits("x", ok)).toEqual([]);
-    const over = agentPlaque({ slug: "a", displayName: "Christopher Montgomery", brokerage: "W" }, "(206) 555-0142", "+1");
+    const over = agentPlaque({ slug: "a", displayName: "Christopher Montgomery", brokerage: "W" }, "sam@example.com");
     const v = checkPlaqueLimits("/for/a plaque", over);
     expect(v).toHaveLength(1);
     expect(v[0].what).toBe("/for/a plaque line 1");

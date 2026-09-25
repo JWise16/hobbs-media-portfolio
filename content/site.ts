@@ -23,9 +23,7 @@ export const heroClip: ClipId = "needle-above-clouds";
 export const heroImage: string | null = null;
 
 export const contact = {
-  /** E.164 for sms:/tel: links. */
-  phoneE164: "+12067904352", // confirmed by Jonny 2026-09-23
-  phoneDisplay: "(206) 790-4352",
+  /** Email is the only direct contact. Sam asked (2026-09-24) that his phone number never appear on the site. */
   email: "hobbsmediaco.sea@gmail.com", // confirmed by Sam 2026-09-24
   /** Sam's handle, once he gives one; null hides the Instagram line and link everywhere. */
   instagram: null as string | null,
@@ -36,8 +34,6 @@ export const contact = {
 } as const;
 
 export const contactLinks = {
-  sms: () => `sms:${contact.phoneE164}`,
-  tel: () => `tel:${contact.phoneE164}`,
   mailto: () => `mailto:${contact.email}`,
   instagram: () => (contact.instagram ? `https://instagram.com/${contact.instagram}` : null),
 };
@@ -94,7 +90,6 @@ export const copy = {
     kicker: "Get in touch",
     headline: "Have a listing coming up?",
     sentence: "Send the address and target list date. I reply the same day with availability and a quote.",
-    textSam: `Text ${brand.firstName}`,
     emailSam: `Email ${brand.firstName}`,
     facts: { basedIn: "Based in", serving: "Serving", instagram: "Instagram", hours: "Hours" },
   },

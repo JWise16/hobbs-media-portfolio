@@ -91,9 +91,9 @@ describe("small helpers", () => {
     expect(() => parseColor("#fff")).toThrow(/unparsable/);
     expect(parseColor("rgba(1, 2, 3, 0.5)")).toEqual([1, 2, 3]);
 
-    const p = agentPlaque({ slug: "solo", displayName: "Sam Solo" }, "(206) 555-0142", "+12065550142");
+    const p = agentPlaque({ slug: "solo", displayName: "Sam Solo" }, "sam@example.com");
     expect(p[0].text).toBe("PREPARED FOR SAM SOLO");
     expect(p[1]).toEqual({ text: "" });
-    expect(p[2].tel).toBe("tel:+12065550142");
+    expect(p[2].href).toBe("mailto:sam@example.com");
   });
 });

@@ -126,7 +126,7 @@ export async function renderOg(theme: ThemeId, match: RouteMatch): Promise<Image
           </div>
         </div>
         <div style={{ position: "absolute", left: 48, bottom: 40, display: "flex", fontFamily: "Support", fontSize: 18, letterSpacing: "0.2em", color: colors.text, opacity: 0.8 }}>
-          {contact.phoneDisplay}
+          {contact.email}
         </div>
       </div>
     ),
