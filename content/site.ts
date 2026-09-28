@@ -43,10 +43,11 @@ export const contactLinks = {
  * Line one is set without spaces around the middots: with 0.28em tracking the
  * dots read as spaced, and the spaced form is 33 characters.
  */
-export const homePlaque: readonly [string, string, string] = [
+export const homePlaque: readonly [string, string, string, ...string[]] = [
   "REAL ESTATE PHOTO·FILM·AERIAL",
   "SEATTLE & PUGET SOUND", // approved by Sam 2026-09-23
   "FAA PART 107 CERTIFIED",
+  "FREELANCE", // Sam, 2026-09-28
 ];
 
 export interface Service {
