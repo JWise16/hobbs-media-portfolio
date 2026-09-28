@@ -29,10 +29,12 @@ export interface PlaqueLine {
   href?: string;
 }
 
-export type Plaque = readonly [PlaqueLine, PlaqueLine, PlaqueLine];
+/** Three lines by design (10A); the home plaque may carry a fourth (Sam, 2026-09-28: "Freelance"). */
+export type Plaque = readonly [PlaqueLine, PlaqueLine, PlaqueLine, ...PlaqueLine[]];
 
-export function homePlaqueLines(lines: readonly [string, string, string]): Plaque {
-  return [{ text: lines[0] }, { text: lines[1] }, { text: lines[2] }];
+export function homePlaqueLines(lines: readonly [string, string, string, ...string[]]): Plaque {
+  const [a, b, c, ...rest] = lines;
+  return [{ text: a }, { text: b }, { text: c }, ...rest.map((text) => ({ text }))];
 }
 
 export function agentPlaque(agent: Agent, email: string): Plaque {

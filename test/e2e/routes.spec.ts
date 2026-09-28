@@ -90,7 +90,8 @@ test.describe("routes, metadata, caching", () => {
     for (const path of ["/dark", "/dark/for/jessica", "/dark/p/ocean-ave"]) {
       await page.goto(path);
       const heights = await page.locator(".hero-plaque .plaque-line").evaluateAll((els) => els.map((e) => e.getBoundingClientRect().height));
-      expect(heights.length).toBe(3);
+      expect(heights.length).toBeGreaterThanOrEqual(3);
+      expect(heights.length).toBeLessThanOrEqual(4);
       for (const h of heights) expect(h).toBeLessThan(48);
       const overflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth);
       expect(overflow).toBe(false);

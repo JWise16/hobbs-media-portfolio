@@ -27,6 +27,7 @@ describe("plaque composition (17A)", () => {
     const p = homePlaqueLines(["A", "B", "C"]);
     expect(p.map((l) => l.text)).toEqual(["A", "B", "C"]);
     expect(p.every((l) => !l.href)).toBe(true);
+    expect(homePlaqueLines(["A", "B", "C", "D"]).map((l) => l.text)).toEqual(["A", "B", "C", "D"]);
   });
 
   it("beat-two name line has no dangling dot", () => {
